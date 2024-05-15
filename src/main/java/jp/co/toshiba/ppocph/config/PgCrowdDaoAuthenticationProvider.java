@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  * ログイン認証サービス
  *
  * @author ArkamaHozota
- * @since 2.88
+ * @since 1.00beta
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class PgCrowdDaoAuthenticationProvider extends DaoAuthenticationProvider {

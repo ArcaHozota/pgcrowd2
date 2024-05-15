@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * User拡張クラス(SpringSecurity関連)
  *
  * @author ArkamaHozota
- * @since 2.00
+ * @since 1.00beta
  */
 @EqualsAndHashCode(callSuper = false)
 public final class SecurityAdmin extends User {

@@ -34,7 +34,7 @@ import lombok.Setter;
  * 共通SVGイメージハンドラ
  *
  * @author ArkamaHozota
- * @since 1.10
+ * @since 1.00beta
  */
 @Getter
 @Setter

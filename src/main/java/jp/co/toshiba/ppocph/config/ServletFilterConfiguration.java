@@ -11,7 +11,7 @@ import lombok.extern.log4j.Log4j2;
  * Struts2設定クラス
  *
  * @author ArkamaHozota
- * @since 1.09
+ * @since 1.00beta
  */
 @Log4j2
 @Configuration

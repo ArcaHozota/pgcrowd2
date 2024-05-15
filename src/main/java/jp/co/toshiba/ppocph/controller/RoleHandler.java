@@ -35,7 +35,7 @@ import lombok.Setter;
  * 役割情報処理ハンドラ
  *
  * @author ArkamaHozota
- * @since 1.62
+ * @since 1.00beta
  */
 @Getter
 @Setter

@@ -8,7 +8,7 @@ import lombok.Data;
  * 権限情報転送クラス
  *
  * @author ArkamaHozota
- * @since 3.13
+ * @since 1.00beta
  */
 @Data
 public final class AuthorityDto implements Serializable {

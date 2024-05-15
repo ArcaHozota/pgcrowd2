@@ -22,7 +22,7 @@ import lombok.Setter;
  * 分類管理ハンドラ
  *
  * @author ArkamaHozota
- * @since 1.10
+ * @since 1.00beta
  */
 @Getter
 @Setter

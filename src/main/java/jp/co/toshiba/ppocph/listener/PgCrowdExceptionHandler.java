@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
  * Struts2例外処理インターセプト
  *
  * @author ArkamaHozota
- * @since 2.98
+ * @since 1.00beta
  */
 @Log4j2
 public final class PgCrowdExceptionHandler extends DefaultDispatcherErrorHandler {
