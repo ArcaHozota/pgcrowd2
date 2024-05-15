@@ -1,0 +1,82 @@
+/* General Font */
+@font-face {
+	font-family: 'SourceHanSans';
+	src: local('../fonts/SourceHanSans-Regular.otf'),
+		local('../fonts/SourceHanSans-Medium.otf');
+}
+
+/* General CSS */
+body {
+	font-style: normal;
+	font-weight: normal;
+	font-family: 'SourceHanSans', sans-serif;
+}
+
+.text-bg-klein {
+	color: #fff !important;
+	background-color: #002fa7 !important;
+}
+
+.border-klein {
+	--bs-border-opacity: 1;
+	border-color: #002fa7 !important;
+}
+
+.text-bg-darkgreen {
+	color: #fff !important;
+	background-color: #005300 !important;
+}
+
+.border-darkgreen {
+	--bs-border-opacity: 1;
+	border-color: #005300 !important;
+}
+
+.text-bg-tunagray {
+	color: #fff !important;
+	background-color: #353542 !important;
+}
+
+.border-tunagray {
+	border-color: #353542 !important;
+}
+
+.text-bg-steelblue {
+	color: #fff !important;
+	background-color: #4682B4 !important;
+}
+
+.border-steelblue {
+	border-color: #4682B4 !important;
+}
+
+.btn-primary {
+	color: #fff !important;
+	background-color: #002fa7 !important;
+	border-color: #002fa7 !important;
+}
+
+.btn-success {
+	color: #fff !important;
+	background-color: #005300 !important;
+	border-color: #005300 !important;
+}
+
+.btn-danger {
+	color: #fff !important;
+	background-color: #7f0020 !important;
+	border-color: #7f0020 !important;
+}
+
+.btn-warning {
+	color: #000 !important;
+	background-color: #f6c91c !important;
+	border-color: #f6c91c !important;
+}
+
+
+.btn-info {
+	color: #000 !important;
+	background-color: #81d8d0 !important;
+	border-color: #81d8d0 !important;
+}

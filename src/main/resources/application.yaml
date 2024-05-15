@@ -1,0 +1,35 @@
+server:
+  port: 8688
+  jetty:
+    threads:
+      acceptors: 2 
+      selectors: 4 
+      max: 20 
+      min: 4 
+spring:
+  application:
+    name: pgcrowd
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://52.199.163.241:5432/pgcrowd
+    username: postgres
+    password: postgres
+    hikari:
+      maximum-pool-size: 30
+      max-lifetime: 1500000
+  output:
+    ansi:
+      enabled: ALWAYS
+  freemarker:
+    allow-request-override: true
+    allow-session-override: true
+    suffix: .ftl
+    settings:
+      {datetimeFormat: yyyy-MM-dd HH:mm:ss, templateUpdateDelay: 0ms}
+# jOOQで生成したSQL文はコンソルで表示する
+logging:
+  level:
+    org:
+      jooq:
+        tools:
+          LoggerListener: DEBUG
