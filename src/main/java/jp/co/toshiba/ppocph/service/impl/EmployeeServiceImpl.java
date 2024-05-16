@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -80,7 +81,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		employeeDto.setId(employeesRecord.getId().toString());
 		employeeDto.setLoginAccount(employeesRecord.getLoginAccount());
 		employeeDto.setUsername(employeesRecord.getUsername());
-		employeeDto.setPassword(employeesRecord.getPassword());
+		employeeDto.setPassword(PgCrowdConstants.DEFAULT_ROLE_NAME);
 		employeeDto.setEmail(employeesRecord.getEmail());
 		employeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 		employeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
@@ -111,7 +112,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).fetchSingle()
 					.into(Integer.class);
 			final List<EmployeesRecord> employeesRecords = this.dslContext.selectFrom(EMPLOYEES)
-					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(EMPLOYEES.ID.asc())
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(EmployeesRecord.class);
 			final List<EmployeeDto> employeeDtos = employeesRecords.stream().map(item -> {
 				final EmployeeDto employeeDto = new EmployeeDto();
@@ -135,7 +136,8 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 				.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(EMPLOYEES.USERNAME.like(searchStr).or(EMPLOYEES.LOGIN_ACCOUNT.like(searchStr))
 						.or(EMPLOYEES.EMAIL.like(searchStr)))
-				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(EmployeesRecord.class);
+				.orderBy(EMPLOYEES.ID.asc()).limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset)
+				.fetchInto(EmployeesRecord.class);
 		final List<EmployeeDto> employeeDtos = employeesRecords.stream().map(item -> {
 			final EmployeeDto employeeDto = new EmployeeDto();
 			employeeDto.setId(item.getId().toString());
@@ -224,7 +226,8 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 
 	@Override
 	public ResultDto<String> update(final EmployeeDto employeeDto) {
-		if (CommonProjectUtils.isNotEmpty(employeeDto.getPassword())) {
+		final boolean passwordNotEmpty = CommonProjectUtils.isNotEmpty(employeeDto.getPassword());
+		if (passwordNotEmpty) {
 			employeeDto.setPassword(this.encoder.encode(employeeDto.getPassword()));
 		}
 		final EmployeesRecord employeesRecord = this.dslContext.selectFrom(EMPLOYEES)
@@ -236,7 +239,9 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		aEmployeeDto.setId(employeesRecord.getId().toString());
 		aEmployeeDto.setLoginAccount(employeesRecord.getLoginAccount());
 		aEmployeeDto.setUsername(employeesRecord.getUsername());
-		aEmployeeDto.setPassword(employeesRecord.getPassword());
+		if (passwordNotEmpty) {
+			aEmployeeDto.setPassword(employeesRecord.getPassword());
+		}
 		aEmployeeDto.setEmail(employeesRecord.getEmail());
 		aEmployeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
@@ -245,14 +250,21 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		}
 		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
 		employeesRecord.setUsername(employeeDto.getUsername());
-		if (CommonProjectUtils.isNotEmpty(employeeDto.getPassword())) {
+		if (passwordNotEmpty) {
 			employeesRecord.setPassword(employeeDto.getPassword());
 		}
 		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
 		employeeRoleRecord.setRoleId(Long.parseLong(employeeDto.getRoleId()));
-		employeeRoleRecord.insert();
-		employeesRecord.insert();
+		try {
+			this.dslContext.update(EMPLOYEE_ROLE).set(employeeRoleRecord)
+					.where(EMPLOYEE_ROLE.EMPLOYEE_ID.eq(employeeRoleRecord.getEmployeeId())).execute();
+			this.dslContext.update(EMPLOYEES).set(employeesRecord)
+					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+					.and(EMPLOYEES.ID.eq(employeesRecord.getId())).execute();
+		} catch (final DataIntegrityViolationException e) {
+			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_DUPLICATED);
+		}
 		return ResultDto.successWithoutData();
 	}
 }

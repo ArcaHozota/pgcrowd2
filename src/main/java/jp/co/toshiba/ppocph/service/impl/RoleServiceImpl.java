@@ -1,27 +1,33 @@
 package jp.co.toshiba.ppocph.service.impl;
 
 import static jp.co.toshiba.ppocph.jooq.Tables.AUTHORITIES;
+import static jp.co.toshiba.ppocph.jooq.Tables.EMPLOYEE_ROLE;
 import static jp.co.toshiba.ppocph.jooq.Tables.ROLES;
 import static jp.co.toshiba.ppocph.jooq.Tables.ROLE_AUTH;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import jp.co.toshiba.ppocph.common.PgCrowdConstants;
 import jp.co.toshiba.ppocph.dto.AuthorityDto;
 import jp.co.toshiba.ppocph.dto.RoleDto;
 import jp.co.toshiba.ppocph.jooq.tables.records.AuthoritiesRecord;
+import jp.co.toshiba.ppocph.jooq.tables.records.EmployeeRoleRecord;
 import jp.co.toshiba.ppocph.jooq.tables.records.RoleAuthRecord;
+import jp.co.toshiba.ppocph.jooq.tables.records.RolesRecord;
 import jp.co.toshiba.ppocph.service.IRoleService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
 import jp.co.toshiba.ppocph.utils.Pagination;
 import jp.co.toshiba.ppocph.utils.ResultDto;
 import jp.co.toshiba.ppocph.utils.SecondBeanUtils;
+import jp.co.toshiba.ppocph.utils.SnowflakeUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -98,112 +104,106 @@ public final class RoleServiceImpl implements IRoleService {
 
 	@Override
 	public RoleDto getRoleById(final Long id) {
-		return null;
-//		final Role role = this.roleRepository.findById(id).orElseThrow(() -> {
-//			throw new OgumaProjectException(PgCrowdConstants.MESSAGE_STRING_NOT_EXISTS);
-//		});
-//		return new RoleDto(role.getId(), role.getName());
+		final RolesRecord rolesRecord = this.dslContext.selectFrom(ROLES)
+				.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(ROLES.ID.eq(id)).fetchSingle();
+		final RoleDto roleDto = new RoleDto();
+		roleDto.setId(rolesRecord.getId().toString());
+		roleDto.setName(rolesRecord.getName());
+		return roleDto;
 	}
 
 	@Override
 	public List<RoleDto> getRolesByEmployeeId(final String employeeId) {
-		return null;
-//		final List<RoleDto> secondRoles = new ArrayList<>();
-//		final RoleDto secondRole = new RoleDto(0L, PgCrowdConstants.DEFAULT_ROLE_NAME);
-//		final Specification<Role> where1 = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(DELETE_FLG),
-//				PgCrowdConstants.LOGIC_DELETE_INITIAL);
-//		final Specification<Role> specification1 = Specification.where(where1);
-//		final List<RoleDto> roleDtos = this.roleRepository.findAll(specification1).stream()
-//				.map(item -> new RoleDto(item.getId(), item.getName())).toList();
-//		secondRoles.add(secondRole);
-//		secondRoles.addAll(roleDtos);
-//		if (employeeId == null) {
-//			return secondRoles;
-//		}
-//		final Optional<EmployeeRole> roledOptional = this.employeeExRepository.findById(employeeId);
-//		if (roledOptional.isEmpty()) {
-//			return secondRoles;
-//		}
-//		secondRoles.clear();
-//		final Long roleId = roledOptional.get().getRoleId();
-//		final List<RoleDto> selectedRole = roleDtos.stream().filter(a -> Objects.equals(a.id(), roleId)).toList();
-//		secondRoles.addAll(selectedRole);
-//		secondRoles.addAll(roleDtos);
-//		return secondRoles.stream().distinct().toList();
+		final List<RoleDto> roleDtos = new ArrayList<>();
+		final List<RolesRecord> rolesRecords = this.dslContext.selectFrom(ROLES)
+				.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(ROLES.ID.asc())
+				.fetchInto(RolesRecord.class);
+		final List<RoleDto> roleDtos1 = rolesRecords.stream().map(item -> {
+			final RoleDto roleDto = new RoleDto();
+			roleDto.setId(item.getId().toString());
+			roleDto.setName(item.getName());
+			return roleDto;
+		}).distinct().collect(Collectors.toList());
+		if (CommonProjectUtils.isEmpty(employeeId)) {
+			final RoleDto roleDto = new RoleDto();
+			roleDto.setId(String.valueOf(0L));
+			roleDto.setName(PgCrowdConstants.DEFAULT_ROLE_NAME);
+			roleDtos.add(roleDto);
+		} else {
+			final EmployeeRoleRecord employeeRoleRecord = this.dslContext.selectFrom(EMPLOYEE_ROLE)
+					.where(EMPLOYEE_ROLE.EMPLOYEE_ID.eq(Long.parseLong(employeeId))).fetchSingle();
+			final List<RoleDto> list = roleDtos1.stream()
+					.filter(a -> CommonProjectUtils.isEqual(employeeRoleRecord.getRoleId(), Long.parseLong(a.getId())))
+					.collect(Collectors.toList());
+			roleDtos.addAll(list);
+		}
+		roleDtos.addAll(roleDtos1);
+		return roleDtos.stream().distinct().collect(Collectors.toList());
 	}
 
 	@Override
 	public Pagination<RoleDto> getRolesByKeyword(final Integer pageNum, final String keyword) {
-		return null;
-//		final PageRequest pageRequest = PageRequest.of(pageNum - 1, PgCrowdConstants.DEFAULT_PAGE_SIZE,
-//				Sort.by(Direction.ASC, "id"));
-//		final Specification<Role> where1 = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(DELETE_FLG),
-//				PgCrowdConstants.LOGIC_DELETE_INITIAL);
-//		final Specification<Role> specification = Specification.where(where1);
-//		if (OgumaProjectUtils.isEmpty(keyword)) {
-//			final Page<Role> pages = this.roleRepository.findAll(specification, pageRequest);
-//			final List<RoleDto> roleDtos = pages.stream().map(item -> new RoleDto(item.getId(), item.getName()))
-//					.toList();
-//			return Pagination.of(roleDtos, pages.getTotalElements(), pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
-//		}
-//		if (OgumaProjectUtils.isDigital(keyword)) {
-//			final Page<Role> byIdLike = this.roleRepository.findByIdLike(keyword,
-//					PgCrowdConstants.LOGIC_DELETE_INITIAL, pageRequest);
-//			final List<RoleDto> roleDtos = byIdLike.stream().map(item -> new RoleDto(item.getId(), item.getName()))
-//					.toList();
-//			return Pagination.of(roleDtos, byIdLike.getTotalElements(), pageNum,
-//					PgCrowdConstants.DEFAULT_PAGE_SIZE);
-//		}
-//		final String searchStr = OgumaProjectUtils.getDetailKeyword(keyword);
-//		final Specification<Role> where2 = (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get(ROLE_NAME),
-//				searchStr);
-//		final Page<Role> pages = this.roleRepository.findAll(specification.and(where2), pageRequest);
-//		final List<RoleDto> roleDtos = pages.stream().map(item -> new RoleDto(item.getId(), item.getName())).toList();
-//		return Pagination.of(roleDtos, pages.getTotalElements(), pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
+		final int offset = (pageNum - 1) * PgCrowdConstants.DEFAULT_PAGE_SIZE;
+		if (CommonProjectUtils.isEmpty(keyword)) {
+			final Integer totalRecords = this.dslContext.selectCount().from(ROLES)
+					.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).fetchSingle()
+					.into(Integer.class);
+			final List<RoleDto> roleDtos = this.dslContext.select(ROLES.ID, ROLES.NAME).from(ROLES)
+					.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(ROLES.ID.asc())
+					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(RoleDto.class);
+			return Pagination.of(roleDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
+		}
+		final String searchStr = CommonProjectUtils.getDetailKeyword(keyword);
+		final Integer totalRecords = this.dslContext.selectCount().from(ROLES)
+				.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+				.and(ROLES.NAME.like(searchStr).or(ROLES.ID.like(keyword))).fetchSingle().into(Integer.class);
+		final List<RoleDto> roleDtos = this.dslContext.select(ROLES.ID, ROLES.NAME).from(ROLES)
+				.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+				.and(ROLES.NAME.like(searchStr).or(ROLES.ID.like(keyword))).orderBy(ROLES.ID.asc())
+				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(RoleDto.class);
+		return Pagination.of(roleDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 	}
 
 	@Override
 	public ResultDto<String> remove(final Long id) {
-//		final Specification<EmployeeRole> where = (root, query, criteriaBuilder) -> criteriaBuilder
-//				.equal(root.get(ROLE_ID), id);
-//		final Specification<EmployeeRole> specification = Specification.where(where);
-//		final List<EmployeeRole> list = this.employeeExRepository.findAll(specification);
-//		if (!list.isEmpty()) {
-//			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_FORBIDDEN);
-//		}
-//		final Role role = this.roleRepository.findById(id).orElseThrow(() -> {
-//			throw new OgumaProjectException(PgCrowdConstants.MESSAGE_STRING_FATAL_ERROR);
-//		});
-//		role.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_FLG);
-//		this.roleRepository.saveAndFlush(role);
+		final Integer roleUsageCount = this.dslContext.selectCount().from(EMPLOYEE_ROLE)
+				.where(EMPLOYEE_ROLE.ROLE_ID.eq(id)).fetchSingle().into(Integer.class);
+		if (roleUsageCount > 0) {
+			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_FORBIDDEN);
+		}
+		this.dslContext.update(ROLES).set(ROLES.DELETE_FLG, PgCrowdConstants.LOGIC_DELETE_FLG).where(ROLES.ID.eq(id))
+				.execute();
 		return ResultDto.successWithoutData();
 	}
 
 	@Override
 	public void save(final RoleDto roleDto) {
-//		final Role role = new Role();
-//		SecondBeanUtils.copyNullableProperties(roleDto, role);
-//		role.setId(SnowflakeUtils.snowflakeId());
-//		role.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
-//		this.roleRepository.saveAndFlush(role);
+		final RolesRecord rolesRecord = this.dslContext.newRecord(ROLES);
+		rolesRecord.setId(SnowflakeUtils.snowflakeId());
+		rolesRecord.setName(roleDto.getName());
+		rolesRecord.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
+		rolesRecord.insert();
 	}
 
 	@Override
 	public ResultDto<String> update(final RoleDto roleDto) {
-//		final Role role = this.roleRepository.findById(roleDto.id()).orElseThrow(() -> {
-//			throw new OgumaProjectException(PgCrowdConstants.MESSAGE_STRING_FATAL_ERROR);
-//		});
-//		final Role originalEntity = new Role();
-//		SecondBeanUtils.copyNullableProperties(role, originalEntity);
-//		SecondBeanUtils.copyNullableProperties(roleDto, role);
-//		if (originalEntity.equals(role)) {
-//			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
-//		}
-//		try {
-//			this.roleRepository.saveAndFlush(role);
-//		} catch (final DataIntegrityViolationException e) {
-//			return ResultDto.failed(PgCrowdConstants.MESSAGE_ROLE_NAME_DUPLICATED);
-//		}
+		final RolesRecord rolesRecord = this.dslContext.selectFrom(ROLES)
+				.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+				.and(ROLES.ID.eq(Long.parseLong(roleDto.getId()))).fetchSingle();
+		final RoleDto aRoleDto = new RoleDto();
+		aRoleDto.setId(rolesRecord.getId().toString());
+		aRoleDto.setName(roleDto.getName());
+		if (CommonProjectUtils.isEqual(aRoleDto, roleDto)) {
+			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
+		}
+		rolesRecord.setName(roleDto.getName());
+		try {
+			this.dslContext.update(ROLES).set(rolesRecord)
+					.where(ROLES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+					.and(ROLES.ID.eq(rolesRecord.getId())).execute();
+		} catch (final DataIntegrityViolationException e) {
+			return ResultDto.failed(PgCrowdConstants.MESSAGE_ROLE_NAME_DUPLICATED);
+		}
 		return ResultDto.successWithoutData();
 	}
 }
