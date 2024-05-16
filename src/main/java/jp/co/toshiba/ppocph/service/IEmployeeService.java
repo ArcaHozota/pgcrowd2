@@ -52,14 +52,6 @@ public interface IEmployeeService {
 	void remove(Long userId);
 
 	/**
-	 * パスワードをリセットする
-	 *
-	 * @param employeeDto 社員情報転送クラス
-	 * @return Boolean
-	 */
-	Boolean resetPassword(EmployeeDto employeeDto);
-
-	/**
 	 * 社員情報追加
 	 *
 	 * @param employeeDto 社員情報転送クラス
