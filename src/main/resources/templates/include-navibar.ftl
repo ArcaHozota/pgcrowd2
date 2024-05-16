@@ -2,8 +2,8 @@
 <html lang="ja-JP">
 <body>
 	<#assign principalAdmin = Session.SPRING_SECURITY_CONTEXT.authentication.principal
-	        userAdminName = principalAdmin.getOriginalAdmin().getUsername()
-	        personalId = principalAdmin.getOriginalAdmin().getId()>
+	        userAdminName = principalAdmin.originalAdmin.username
+	        personalId = principalAdmin.originalAdmin.id>
 	<nav class="navbar navbar-expand-lg bg-body-tertiary navbar-dark bg-dark fixed-top">
 		<div class="container-fluid">
 			<a class="navbar-brand effect-shine" style="font-size: 24px; font-weight: 900;" 

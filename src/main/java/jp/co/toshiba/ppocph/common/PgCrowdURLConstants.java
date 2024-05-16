@@ -58,9 +58,9 @@ public final class PgCrowdURLConstants {
 
 	public static final String URL_INFO_UPDATE = "infoUpdate";
 
-	public static final String URL_AUTH_LIST = "getAuthlist";
+	public static final String URL_AUTH_LIST = "getAuthList";
 
-	public static final String URL_AUTH_ASSIGNED = "getAssignedAuth";
+	public static final String URL_AUTH_ASSIGNED = "getAssignedAuths";
 
 	public static final String URL_DO_ASSIGNMENT = "authAssignment";
 
@@ -70,7 +70,9 @@ public final class PgCrowdURLConstants {
 
 	public static final String URL_TO_CITIES = "toCities";
 
-	public static final String URL_DISTRICT_LIST = "getDistrictlist";
+	public static final String URL_DISTRICT_LIST = "getDistrictList";
+
+	public static final String URL_CHIHO_LIST = "getChihoList";
 
 	public static final String URL_CITY_FLAGS = "getCityFlags";
 

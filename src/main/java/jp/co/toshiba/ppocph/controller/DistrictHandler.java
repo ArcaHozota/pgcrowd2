@@ -5,6 +5,8 @@ import static com.opensymphony.xwork2.Action.LOGIN;
 import static com.opensymphony.xwork2.Action.NONE;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.apache.struts2.convention.annotation.Action;
@@ -104,6 +106,18 @@ public class DistrictHandler extends ActionSupport {
 	@Action(PgCrowdURLConstants.URL_CHECK_EDITION)
 	public String checkEdition() {
 		this.setResponsedJsondata(ResultDto.successWithoutData());
+		return NONE;
+	}
+
+	/**
+	 * 情報一覧画面初期表示する
+	 *
+	 * @return String
+	 */
+	@Action(PgCrowdURLConstants.URL_CHIHO_LIST)
+	public String getChihos() {
+		final List<String> chihos = this.iDistrictService.getDistrictChihos();
+		this.setResponsedJsondata(ResultDto.successWithData(chihos));
 		return NONE;
 	}
 

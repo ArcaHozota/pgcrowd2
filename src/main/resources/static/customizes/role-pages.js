@@ -116,7 +116,7 @@ $("#tableBody").on('click', '.delete-btn', function() {
 });
 $("#tableBody").on('click', '.fuyo-btn', function() {
 	let ajaxResult = $.ajax({
-		url: '/pgcrowd/role/getAuthlist',
+		url: '/pgcrowd/role/getAuthList',
 		type: 'GET',
 		async: false
 	});
@@ -157,7 +157,7 @@ $("#tableBody").on('click', '.fuyo-btn', function() {
 	let zTreeObj = $.fn.zTree.getZTreeObj("authTree");
 	zTreeObj.expandAll(true);
 	ajaxResult = $.ajax({
-		url: '/pgcrowd/role/getAssignedAuth',
+		url: '/pgcrowd/role/getAssignedAuths',
 		data: 'fuyoId=' + fuyoId,
 		type: 'GET',
 		async: false

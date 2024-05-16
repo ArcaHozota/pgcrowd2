@@ -75,8 +75,7 @@
 	                    <div class="form-group row">
 	                        <label for="chihoEdit" class="col-sm-3 col-form-label text-right">地方</label>
 	                        <div class="col-sm-9" style="height: 5.7vh;">
-	                            <input type="text" class="form-control" id="chihoEdit" placeholder="地方"> 
-	                            <span class="text-muted" style="font-size: 10px;"></span>
+	                            <select id="chihoEdit" class="custom-select"></select>
 	                        </div>
 	                    </div>
 	                    <div class="form-group row">

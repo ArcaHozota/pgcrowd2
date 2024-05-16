@@ -147,7 +147,7 @@ public class RoleHandler extends ActionSupport {
 	 */
 	@PreAuthorize("hasAuthority('role%edition')")
 	@Action(PgCrowdURLConstants.URL_AUTH_ASSIGNED)
-	public String getAssignedAuth() {
+	public String getAssignedAuths() {
 		final String fuyoId = ActionContext.getContext().getServletRequest().getParameter("fuyoId");
 		final List<String> authIdsById = this.iRoleService.getAuthIdsById(Long.parseLong(fuyoId));
 		this.setResponsedJsondata(ResultDto.successWithData(authIdsById));
@@ -161,7 +161,7 @@ public class RoleHandler extends ActionSupport {
 	 */
 	@PreAuthorize("hasAuthority('role%edition')")
 	@Action(PgCrowdURLConstants.URL_AUTH_LIST)
-	public String getAuthlist() {
+	public String getAuths() {
 		final List<AuthorityDto> authList = this.iRoleService.getAuthList();
 		this.setResponsedJsondata(ResultDto.successWithData(authList));
 		return NONE;

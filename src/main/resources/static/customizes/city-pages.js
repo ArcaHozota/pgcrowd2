@@ -179,7 +179,7 @@ function checkCityName(cityName, district) {
 function getDistricts(element, cityId) {
 	$(element).empty();
 	$.ajax({
-		url: '/pgcrowd/city/getDistrictlist',
+		url: '/pgcrowd/city/getDistrictList',
 		data: 'cityId=' + cityId,
 		type: 'GET',
 		success: function(result) {

@@ -15,6 +15,13 @@ import jp.co.toshiba.ppocph.utils.ResultDto;
 public interface IDistrictService {
 
 	/**
+	 * 地方リストを取得する
+	 *
+	 * @return List<String>
+	 */
+	List<String> getDistrictChihos();
+
+	/**
 	 * 都市IDによって地域一覧を取得する
 	 *
 	 * @param cityId 都市ID
