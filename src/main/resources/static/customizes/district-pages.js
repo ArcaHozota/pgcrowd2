@@ -60,11 +60,12 @@ $("#tableBody").on('click', '.edit-btn', function() {
 	$("#districtInfoChangeBtn").val(editId);
 	let nameVal = $(this).parent().parent().find("td:eq(0)").text();
 	let shutoVal = $(this).parent().parent().find("td:eq(1)").text();
+	let chihoVal = $(this).parent().parent().find("td:eq(2)").text();
 	let populationVal = $(this).parent().parent().find("td:eq(3)").text();
 	$("#nameEdit").val(nameVal);
 	$("#shutoEdit").text(shutoVal);
 	$("#populationEdit").text(populationVal);
-	getChihos("#chihoEdit");
+	getChihos("#chihoEdit", chihoVal);
 	$("#districtEditModal").modal({
 		backdrop: 'static'
 	});
@@ -89,10 +90,11 @@ $("#tableBody").on('click', '.district-flg-td', function() {
 	let nameVal = $(this).parent().find("td:eq(0)").text();
 	window.open('https://ja.wikipedia.org/wiki/' + nameVal);
 });
-function getChihos(element) {
+function getChihos(element, chihoVal) {
 	$(element).empty();
 	$.ajax({
 		url: '/pgcrowd/district/getChihoList',
+		data: 'chiho=' + chihoVal,
 		type: 'GET',
 		success: function(result) {
 			$.each(result.data, (index, item) => {

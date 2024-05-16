@@ -116,7 +116,8 @@ public class DistrictHandler extends ActionSupport {
 	 */
 	@Action(PgCrowdURLConstants.URL_CHIHO_LIST)
 	public String getChihos() {
-		final List<String> chihos = this.iDistrictService.getDistrictChihos();
+		final String chiho = ActionContext.getContext().getServletRequest().getParameter("chiho");
+		final List<String> chihos = this.iDistrictService.getDistrictChihos(chiho);
 		this.setResponsedJsondata(ResultDto.successWithData(chihos));
 		return NONE;
 	}

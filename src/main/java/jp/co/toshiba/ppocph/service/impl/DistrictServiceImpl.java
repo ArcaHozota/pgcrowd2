@@ -42,10 +42,14 @@ public final class DistrictServiceImpl implements IDistrictService {
 	private final DSLContext dslContext;
 
 	@Override
-	public List<String> getDistrictChihos() {
-		return this.dslContext.selectDistinct(DISTRICTS.CHIHO).from(DISTRICTS)
-				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
+	public List<String> getDistrictChihos(final String chiho) {
+		final List<String> chihoList = new ArrayList<>();
+		final List<String> chihos = this.dslContext.selectDistinct(DISTRICTS.CHIHO).from(DISTRICTS)
+				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(DISTRICTS.CHIHO.ne(chiho))
 				.fetchInto(String.class);
+		chihoList.add(chiho);
+		chihoList.addAll(chihos);
+		return chihoList;
 	}
 
 	@Override
