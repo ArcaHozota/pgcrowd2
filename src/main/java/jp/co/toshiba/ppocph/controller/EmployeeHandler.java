@@ -110,6 +110,18 @@ public class EmployeeHandler extends ActionSupport {
 	private String roleId;
 
 	/**
+	 * 削除権限チェック
+	 *
+	 * @return String
+	 */
+	@PreAuthorize("hasAuthority('employee%delete')")
+	@Action(PgCrowdURLConstants.URL_CHECK_DELETE)
+	public String checkDelete() {
+		this.setResponsedJsondata(ResultDto.successWithoutData());
+		return NONE;
+	}
+
+	/**
 	 * getter for employeeDto
 	 *
 	 * @return EmployeeDto

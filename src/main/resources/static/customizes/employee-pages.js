@@ -53,7 +53,7 @@ function buildTableBody(result) {
 $("#tableBody").on('click', '.delete-btn', function() {
 	let userId = $(this).attr("deleteId");
 	let userName = $(this).parents("tr").find("td:eq(0)").text().trim();
-	normalDeletebtnFunction('/pgcrowd/employee/infoDelete?userId=', 'この「' + userName + '」という社員の情報を削除するとよろしいでしょうか。', userId);
+	normalDeletebtnFunction('/pgcrowd/employee/', 'この「' + userName + '」という社員の情報を削除するとよろしいでしょうか。', userId);
 });
 $("#addInfoBtn").on('click', function(e) {
 	e.preventDefault();

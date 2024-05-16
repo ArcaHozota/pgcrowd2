@@ -293,7 +293,7 @@ function normalAddbtnFunction(checkUrl, modalName) {
 }
 function normalDeletebtnFunction(url, message, deleteId) {
 	let ajaxResult = $.ajax({
-		url: url + '0L',
+		url: url + 'checkDelete',
 		type: 'GET',
 		async: false
 	});
@@ -310,7 +310,7 @@ function normalDeletebtnFunction(url, message, deleteId) {
 		confirmButtonColor: '#7F0020'
 	}).then((result) => {
 		if (result.isConfirmed) {
-			pgcrowdAjaxModify(url + deleteId, 'DELETE', null, normalDeleteSuccessFunction);
+			pgcrowdAjaxModify(url + 'infoDelete?id=' +deleteId, 'DELETE', null, normalDeleteSuccessFunction);
 		} else {
 			$(this).close();
 		}

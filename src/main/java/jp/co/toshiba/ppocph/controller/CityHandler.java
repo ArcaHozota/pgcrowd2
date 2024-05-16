@@ -106,6 +106,18 @@ public class CityHandler extends ActionSupport {
 	private String cityFlag;
 
 	/**
+	 * 削除権限チェック
+	 *
+	 * @return String
+	 */
+	@PreAuthorize("hasAuthority('city%edition')")
+	@Action(PgCrowdURLConstants.URL_CHECK_DELETE)
+	public String checkDelete() {
+		this.setResponsedJsondata(ResultDto.successWithoutData());
+		return NONE;
+	}
+
+	/**
 	 * 名称重複チェック
 	 *
 	 * @return String

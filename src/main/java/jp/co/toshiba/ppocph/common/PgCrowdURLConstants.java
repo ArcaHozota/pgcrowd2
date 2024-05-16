@@ -32,6 +32,8 @@ public final class PgCrowdURLConstants {
 
 	public static final String URL_CHECK_EDITION = "checkEdition";
 
+	public static final String URL_CHECK_DELETE = "checkDelete";
+
 	public static final String URL_TO_LOGIN = "login";
 
 	public static final String URL_LOG_OUT = "logout";

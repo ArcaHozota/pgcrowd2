@@ -86,6 +86,18 @@ public class RoleHandler extends ActionSupport {
 	private List<String> roleIds;
 
 	/**
+	 * 削除権限チェック
+	 *
+	 * @return String
+	 */
+	@PreAuthorize("hasAuthority('role%delete')")
+	@Action(PgCrowdURLConstants.URL_CHECK_DELETE)
+	public String checkDelete() {
+		this.setResponsedJsondata(ResultDto.successWithoutData());
+		return NONE;
+	}
+
+	/**
 	 * 名称重複チェック
 	 *
 	 * @return String

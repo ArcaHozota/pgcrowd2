@@ -147,7 +147,7 @@ $("#cityInfoChangeBtn").on('click', function() {
 $("#tableBody").on('click', '.delete-btn', function() {
 	let cityId = $(this).attr("deleteId");
 	let cityName = $(this).parents("tr").find("td:eq(0)").text().trim();
-	normalDeletebtnFunction('/pgcrowd/city/infoDelete?cityId=', 'この「' + cityName + '」という都市の情報を削除する、よろしいでしょうか。', cityId);
+	normalDeletebtnFunction('/pgcrowd/city/', 'この「' + cityName + '」という都市の情報を削除する、よろしいでしょうか。', cityId);
 });
 $("#tableBody").on('click', '.city-flag-td', function() {
 	let nameVal = $(this).parent().find("td:eq(0)").text();
