@@ -145,7 +145,7 @@ public class EmployeeHandler extends ActionSupport {
 	@PreAuthorize("hasAuthority('employee%delete')")
 	@Action(PgCrowdURLConstants.URL_INFO_DELETE)
 	public String infoDelete() {
-		final String userId = ActionContext.getContext().getServletRequest().getParameter("userId");
+		final String userId = ActionContext.getContext().getServletRequest().getParameter("id");
 		this.iEmployeeService.remove(Long.parseLong(userId));
 		this.setResponsedJsondata(ResultDto.successWithoutData());
 		return NONE;

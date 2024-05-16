@@ -186,7 +186,7 @@ public class RoleHandler extends ActionSupport {
 	@PreAuthorize("hasAuthority('role%delete')")
 	@Action(PgCrowdURLConstants.URL_INFO_DELETE)
 	public String infoDelete() {
-		final String roleId = ActionContext.getContext().getServletRequest().getParameter("roleId");
+		final String roleId = ActionContext.getContext().getServletRequest().getParameter("id");
 		final ResultDto<String> remove = this.iRoleService.remove(Long.parseLong(roleId));
 		this.setResponsedJsondata(remove);
 		return NONE;

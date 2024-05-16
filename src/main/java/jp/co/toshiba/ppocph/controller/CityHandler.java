@@ -181,7 +181,7 @@ public class CityHandler extends ActionSupport {
 	@PreAuthorize("hasAuthority('city%edition')")
 	@Action(PgCrowdURLConstants.URL_INFO_DELETE)
 	public String infoDelete() {
-		final String cityId = ActionContext.getContext().getServletRequest().getParameter("cityId");
+		final String cityId = ActionContext.getContext().getServletRequest().getParameter("id");
 		final ResultDto<String> remove = this.iCityService.remove(Long.parseLong(cityId));
 		this.setResponsedJsondata(remove);
 		return NONE;
