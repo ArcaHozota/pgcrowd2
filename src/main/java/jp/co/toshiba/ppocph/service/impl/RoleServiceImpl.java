@@ -26,7 +26,6 @@ import jp.co.toshiba.ppocph.service.IRoleService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
 import jp.co.toshiba.ppocph.utils.Pagination;
 import jp.co.toshiba.ppocph.utils.ResultDto;
-import jp.co.toshiba.ppocph.utils.SecondBeanUtils;
 import jp.co.toshiba.ppocph.utils.SnowflakeUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -95,9 +94,10 @@ public final class RoleServiceImpl implements IRoleService {
 				.orderBy(AUTHORITIES.ID.asc()).fetchInto(AuthoritiesRecord.class);
 		return authoritiesRecords.stream().map(item -> {
 			final AuthorityDto authorityDto = new AuthorityDto();
-			SecondBeanUtils.copyNullableProperties(item, authorityDto);
 			authorityDto.setId(item.getId().toString());
-			authorityDto.setCategoryId(item.getCategoryId().toString());
+			authorityDto.setName(item.getName());
+			authorityDto.setTitle(item.getTitle());
+			authorityDto.setCategoryId(String.valueOf(item.getCategoryId()));
 			return authorityDto;
 		}).collect(Collectors.toList());
 	}
