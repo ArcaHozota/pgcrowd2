@@ -27,7 +27,6 @@ import jp.co.toshiba.ppocph.service.IEmployeeService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
 import jp.co.toshiba.ppocph.utils.Pagination;
 import jp.co.toshiba.ppocph.utils.ResultDto;
-import jp.co.toshiba.ppocph.utils.SecondBeanUtils;
 import jp.co.toshiba.ppocph.utils.SnowflakeUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -78,8 +77,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 				.and(EMPLOYEES.ID.eq(Long.parseLong(id))).fetchSingle();
 		final EmployeeRoleRecord employeeRoleRecord = this.dslContext.selectFrom(EMPLOYEE_ROLE)
 				.where(EMPLOYEE_ROLE.EMPLOYEE_ID.eq(Long.parseLong(id))).fetchSingle();
-		SecondBeanUtils.copyNullableProperties(employeesRecord, employeeDto);
 		employeeDto.setId(employeesRecord.getId().toString());
+		employeeDto.setLoginAccount(employeesRecord.getLoginAccount());
+		employeeDto.setUsername(employeesRecord.getUsername());
+		employeeDto.setPassword(employeesRecord.getPassword());
+		employeeDto.setEmail(employeesRecord.getEmail());
+		employeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 		employeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
 		return employeeDto;
 	}
@@ -93,7 +96,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(EMPLOYEES.ID.eq(userId))
 					.fetchSingle();
 			final EmployeeDto employeeDto = new EmployeeDto();
-			SecondBeanUtils.copyNullableProperties(employeesRecord, employeeDto);
+			employeeDto.setId(employeesRecord.getId().toString());
+			employeeDto.setLoginAccount(employeesRecord.getLoginAccount());
+			employeeDto.setUsername(employeesRecord.getUsername());
+			employeeDto.setPassword(employeesRecord.getPassword());
+			employeeDto.setEmail(employeesRecord.getEmail());
+			employeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 			employeeDtos.add(employeeDto);
 			return Pagination.of(employeeDtos, employeeDtos.size(), pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
@@ -107,8 +115,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(EmployeesRecord.class);
 			final List<EmployeeDto> employeeDtos = employeesRecords.stream().map(item -> {
 				final EmployeeDto employeeDto = new EmployeeDto();
-				SecondBeanUtils.copyNullableProperties(item, employeeDto);
 				employeeDto.setId(item.getId().toString());
+				employeeDto.setLoginAccount(item.getLoginAccount());
+				employeeDto.setUsername(item.getUsername());
+				employeeDto.setPassword(item.getPassword());
+				employeeDto.setEmail(item.getEmail());
+				employeeDto.setDateOfBirth(this.formatter.format(item.getDateOfBirth()));
 				return employeeDto;
 			}).collect(Collectors.toList());
 			return Pagination.of(employeeDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
@@ -126,8 +138,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(EmployeesRecord.class);
 		final List<EmployeeDto> employeeDtos = employeesRecords.stream().map(item -> {
 			final EmployeeDto employeeDto = new EmployeeDto();
-			SecondBeanUtils.copyNullableProperties(item, employeeDto);
 			employeeDto.setId(item.getId().toString());
+			employeeDto.setLoginAccount(item.getLoginAccount());
+			employeeDto.setUsername(item.getUsername());
+			employeeDto.setPassword(item.getPassword());
+			employeeDto.setEmail(item.getEmail());
+			employeeDto.setDateOfBirth(this.formatter.format(item.getDateOfBirth()));
 			return employeeDto;
 		}).collect(Collectors.toList());
 		return Pagination.of(employeeDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
@@ -159,10 +175,11 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 			return Boolean.FALSE;
 		}
 		final EmployeesRecord employeesRecord = this.dslContext.newRecord(EMPLOYEES);
-		SecondBeanUtils.copyNullableProperties(employeeDto, employeesRecord);
 		employeesRecord.setId(SnowflakeUtils.snowflakeId());
 		employeesRecord.setLoginAccount(this.getRandomStr());
+		employeesRecord.setUsername(employeeDto.getUsername());
 		employeesRecord.setPassword(this.encoder.encode(employeeDto.getPassword()));
+		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
 		employeesRecord.setCreatedTime(LocalDateTime.now());
 		employeesRecord.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
@@ -187,9 +204,11 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 	@Override
 	public void save(final EmployeeDto employeeDto) {
 		final EmployeesRecord employeesRecord = this.dslContext.newRecord(EMPLOYEES);
-		SecondBeanUtils.copyNullableProperties(employeeDto, employeesRecord);
 		employeesRecord.setId(SnowflakeUtils.snowflakeId());
+		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
+		employeesRecord.setUsername(employeeDto.getUsername());
 		employeesRecord.setPassword(this.encoder.encode(employeeDto.getPassword()));
+		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
 		employeesRecord.setCreatedTime(LocalDateTime.now());
 		employeesRecord.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
@@ -205,25 +224,31 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 
 	@Override
 	public ResultDto<String> update(final EmployeeDto employeeDto) {
+		if (CommonProjectUtils.isNotEmpty(employeeDto.getPassword())) {
+			employeeDto.setPassword(this.encoder.encode(employeeDto.getPassword()));
+		}
 		final EmployeesRecord employeesRecord = this.dslContext.selectFrom(EMPLOYEES)
 				.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(EMPLOYEES.ID.eq(Long.parseLong(employeeDto.getId()))).fetchSingle();
 		final EmployeeRoleRecord employeeRoleRecord = this.dslContext.selectFrom(EMPLOYEE_ROLE)
 				.where(EMPLOYEE_ROLE.EMPLOYEE_ID.eq(Long.parseLong(employeeDto.getId()))).fetchSingle();
 		final EmployeeDto aEmployeeDto = new EmployeeDto();
-		SecondBeanUtils.copyNullableProperties(employeesRecord, aEmployeeDto);
-		if (CommonProjectUtils.isNotEmpty(employeeDto.getPassword())) {
-			aEmployeeDto.setPassword(this.encoder.encode(employeeDto.getPassword()));
-		}
 		aEmployeeDto.setId(employeesRecord.getId().toString());
+		aEmployeeDto.setLoginAccount(employeesRecord.getLoginAccount());
+		aEmployeeDto.setUsername(employeesRecord.getUsername());
+		aEmployeeDto.setPassword(employeesRecord.getPassword());
+		aEmployeeDto.setEmail(employeesRecord.getEmail());
+		aEmployeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
 		if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		}
-		SecondBeanUtils.copyNullableProperties(employeeDto, employeesRecord);
+		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
+		employeesRecord.setUsername(employeeDto.getUsername());
 		if (CommonProjectUtils.isNotEmpty(employeeDto.getPassword())) {
-			employeesRecord.setPassword(this.encoder.encode(employeeDto.getPassword()));
+			employeesRecord.setPassword(employeeDto.getPassword());
 		}
+		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
 		employeeRoleRecord.setRoleId(Long.parseLong(employeeDto.getRoleId()));
 		employeeRoleRecord.insert();
