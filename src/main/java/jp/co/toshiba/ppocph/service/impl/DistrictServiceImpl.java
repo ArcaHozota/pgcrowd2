@@ -1,7 +1,9 @@
 package jp.co.toshiba.ppocph.service.impl;
 
+import static jp.co.toshiba.ppocph.jooq.Tables.CHIHOS;
 import static jp.co.toshiba.ppocph.jooq.Tables.CITIES;
 import static jp.co.toshiba.ppocph.jooq.Tables.DISTRICTS;
+import static jp.co.toshiba.ppocph.jooq.Tables.SHUTOS;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import jp.co.toshiba.ppocph.common.PgCrowdConstants;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.jooq.Keys;
+import jp.co.toshiba.ppocph.jooq.tables.records.ChihosRecord;
 import jp.co.toshiba.ppocph.jooq.tables.records.DistrictsRecord;
 import jp.co.toshiba.ppocph.service.IDistrictService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
@@ -44,9 +47,8 @@ public final class DistrictServiceImpl implements IDistrictService {
 	@Override
 	public List<String> getDistrictChihos(final String chiho) {
 		final List<String> chihoList = new ArrayList<>();
-		final List<String> chihos = this.dslContext.selectDistinct(DISTRICTS.CHIHO).from(DISTRICTS)
-				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(DISTRICTS.CHIHO.ne(chiho))
-				.fetchInto(String.class);
+		final List<String> chihos = this.dslContext.selectDistinct(CHIHOS.NAME).from(CHIHOS)
+				.where(CHIHOS.NAME.ne(chiho)).fetchInto(String.class);
 		chihoList.add(chiho);
 		chihoList.addAll(chihos);
 		return chihoList;
@@ -55,35 +57,26 @@ public final class DistrictServiceImpl implements IDistrictService {
 	@Override
 	public List<DistrictDto> getDistrictsByCityId(final String cityId) {
 		final List<DistrictDto> districtDtos = new ArrayList<>();
-		final List<DistrictsRecord> districtRecords = this.dslContext.selectFrom(DISTRICTS)
+		final List<DistrictDto> districtDtos1 = this.dslContext
+				.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chiho")).from(DISTRICTS).innerJoin(CHIHOS)
+				.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS)
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
-				.fetchInto(DistrictsRecord.class);
-		final List<DistrictDto> districtDtos1 = districtRecords.stream().map(item -> {
-			final DistrictDto districtDto = new DistrictDto();
-			districtDto.setId(item.getId().toString());
-			districtDto.setName(item.getName());
-			districtDto.setShutoId(item.getShutoId().toString());
-			districtDto.setChiho(item.getChiho());
-			districtDto.setDistrictFlag(item.getDistrictFlag());
-			return districtDto;
-		}).collect(Collectors.toList());
-		final DistrictDto districtDto = new DistrictDto();
+				.fetchInto(DistrictDto.class);
 		if (!CommonProjectUtils.isDigital(cityId)) {
+			final DistrictDto districtDto = new DistrictDto();
 			districtDto.setId(String.valueOf(0L));
 			districtDto.setName(CommonProjectUtils.EMPTY_STRING);
 			districtDto.setChiho(CommonProjectUtils.EMPTY_STRING);
+			districtDtos.add(districtDto);
 		} else {
-			final DistrictsRecord districtsRecord = this.dslContext.select(DISTRICTS.fields()).from(DISTRICTS)
-					.innerJoin(CITIES).onKey(Keys.CITIES__FK_CITIES_DISTRICTS)
+			final DistrictDto districtDto = this.dslContext
+					.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chiho")).from(DISTRICTS).innerJoin(CHIHOS)
+					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
+					.onKey(Keys.CITIES__FK_CITIES_DISTRICTS)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-					.and(CITIES.ID.eq(Long.parseLong(cityId))).fetchSingle().into(DistrictsRecord.class);
-			districtDto.setId(districtsRecord.getId().toString());
-			districtDto.setName(districtsRecord.getName());
-			districtDto.setShutoId(districtsRecord.getShutoId().toString());
-			districtDto.setChiho(districtsRecord.getChiho());
-			districtDto.setDistrictFlag(districtsRecord.getDistrictFlag());
+					.and(CITIES.ID.eq(Long.parseLong(cityId))).fetchSingle().into(DistrictDto.class);
+			districtDtos.add(districtDto);
 		}
-		districtDtos.add(districtDto);
 		districtDtos.addAll(districtDtos1);
 		return districtDtos.stream().distinct().collect(Collectors.toList());
 	}
@@ -96,49 +89,56 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.asTable();
 		final int offset = (pageNum - 1) * PgCrowdConstants.DEFAULT_PAGE_SIZE;
 		if (CommonProjectUtils.isEmpty(keyword)) {
-			final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CITIES)
-					.on(CITIES.ID.eq(DISTRICTS.SHUTO_ID))
+			final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CHIHOS)
+					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS).on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID))
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).fetchSingle()
 					.into(Integer.class);
 			final List<DistrictDto> districtDtos = this.dslContext
-					.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
-							DISTRICTS.CHIHO, subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
-					.from(DISTRICTS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
+					.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, SHUTOS.SHUTO_NAME,
+							CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
+					.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS)
+					.on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
 					.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(DistrictDto.class);
 			return Pagination.of(districtDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
 		final String searchStr = CommonProjectUtils.getDetailKeyword(keyword);
-		final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CITIES)
-				.on(CITIES.ID.eq(DISTRICTS.SHUTO_ID))
-				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(DISTRICTS.NAME.like(searchStr).or(CITIES.NAME.like(searchStr))).fetchSingle().into(Integer.class);
+		final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CHIHOS)
+				.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS).on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID))
+				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(DISTRICTS.NAME
+						.like(searchStr).or(CHIHOS.NAME.like(searchStr)).or(SHUTOS.SHUTO_NAME.like(searchStr)))
+				.fetchSingle().into(Integer.class);
 		final List<DistrictDto> districtDtos = this.dslContext
-				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"), DISTRICTS.CHIHO,
+				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, SHUTOS.SHUTO_NAME, CHIHOS.NAME.as("chiho"),
 						subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
-				.from(DISTRICTS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
+				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS)
+				.on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
 				.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(DISTRICTS.NAME.like(searchStr).or(CITIES.NAME.like(searchStr))).orderBy(DISTRICTS.ID.asc())
-				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(DistrictDto.class);
+				.and(DISTRICTS.NAME.like(searchStr).or(CHIHOS.NAME.like(searchStr))
+						.or(SHUTOS.SHUTO_NAME.like(searchStr)))
+				.orderBy(DISTRICTS.ID.asc()).limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset)
+				.fetchInto(DistrictDto.class);
 		return Pagination.of(districtDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 	}
 
 	@Override
 	public ResultDto<String> update(final DistrictDto districtDto) {
-		final DistrictsRecord districtsRecord = this.dslContext.selectFrom(DISTRICTS)
+		final DistrictDto aDistrictDto = this.dslContext.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chiho"))
+				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS)
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle();
-		final DistrictDto aDistrictDto = new DistrictDto();
-		aDistrictDto.setId(districtsRecord.getId().toString());
-		aDistrictDto.setName(districtsRecord.getName());
-		aDistrictDto.setChiho(districtsRecord.getChiho());
+				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle().into(DistrictDto.class);
 		if (CommonProjectUtils.isEqual(aDistrictDto, districtDto)) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		}
+		final DistrictsRecord districtsRecord = this.dslContext.selectFrom(DISTRICTS)
+				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle();
+		final ChihosRecord chihosRecord = this.dslContext.selectFrom(CHIHOS)
+				.where(CHIHOS.NAME.eq(districtDto.getChiho())).fetchSingle();
 		districtsRecord.setName(districtDto.getName());
-		districtsRecord.setChiho(districtDto.getChiho());
+		districtsRecord.setChihoId(chihosRecord.getId());
 		try {
 			this.dslContext.update(DISTRICTS).set(districtsRecord)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
