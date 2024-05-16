@@ -55,7 +55,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 	/**
 	 * エンコーダ
 	 */
-	private final PasswordEncoder encoder = new BCryptPasswordEncoder(BCryptVersion.$2B);
+	private final PasswordEncoder encoder = new BCryptPasswordEncoder(BCryptVersion.$2Y, 7);
 
 	/**
 	 * 日時フォマーター
@@ -226,10 +226,11 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 
 	@Override
 	public ResultDto<String> update(final EmployeeDto employeeDto) {
-		final boolean passwordNotEmpty = CommonProjectUtils.isNotEmpty(employeeDto.getPassword());
-		if (passwordNotEmpty) {
-			employeeDto.setPassword(this.encoder.encode(employeeDto.getPassword()));
+		String nyuryokuPassword = employeeDto.getPassword();
+		if (CommonProjectUtils.isEmpty(nyuryokuPassword)) {
+			nyuryokuPassword = CommonProjectUtils.EMPTY_STRING;
 		}
+		employeeDto.setPassword(null);
 		final EmployeesRecord employeesRecord = this.dslContext.selectFrom(EMPLOYEES)
 				.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(EMPLOYEES.ID.eq(Long.parseLong(employeeDto.getId()))).fetchSingle();
@@ -239,19 +240,17 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		aEmployeeDto.setId(employeesRecord.getId().toString());
 		aEmployeeDto.setLoginAccount(employeesRecord.getLoginAccount());
 		aEmployeeDto.setUsername(employeesRecord.getUsername());
-		if (passwordNotEmpty) {
-			aEmployeeDto.setPassword(employeesRecord.getPassword());
-		}
 		aEmployeeDto.setEmail(employeesRecord.getEmail());
 		aEmployeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
-		if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
+		if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)
+				&& this.encoder.matches(nyuryokuPassword, employeesRecord.getPassword())) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		}
 		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
 		employeesRecord.setUsername(employeeDto.getUsername());
-		if (passwordNotEmpty) {
-			employeesRecord.setPassword(employeeDto.getPassword());
+		if (CommonProjectUtils.isNotEmpty(nyuryokuPassword)) {
+			employeesRecord.setPassword(this.encoder.encode(nyuryokuPassword));
 		}
 		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
