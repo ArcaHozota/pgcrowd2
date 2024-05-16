@@ -4,72 +4,62 @@
 package jp.co.toshiba.ppocph.jooq.tables.records;
 
 
-import jp.co.toshiba.ppocph.jooq.tables.Roles;
+import jp.co.toshiba.ppocph.jooq.tables.Shutos;
 
 import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.Record3;
 import org.jooq.Row3;
-import org.jooq.impl.UpdatableRecordImpl;
+import org.jooq.impl.TableRecordImpl;
 
 
 /**
- * 役割テーブル
+ * 州都ビュー
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class RolesRecord extends UpdatableRecordImpl<RolesRecord> implements Record3<Long, String, String> {
+public class ShutosRecord extends TableRecordImpl<ShutosRecord> implements Record3<Long, String, String> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>public.roles.id</code>. ID
+     * Setter for <code>public.shutos.id</code>.
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>public.roles.id</code>. ID
+     * Getter for <code>public.shutos.id</code>.
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>public.roles.name</code>. 名称
+     * Setter for <code>public.shutos.shuto_name</code>.
      */
-    public void setName(String value) {
+    public void setShutoName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>public.roles.name</code>. 名称
+     * Getter for <code>public.shutos.shuto_name</code>.
      */
-    public String getName() {
+    public String getShutoName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>public.roles.delete_flg</code>. 論理削除フラグ
+     * Setter for <code>public.shutos.pronunciation</code>.
      */
-    public void setDeleteFlg(String value) {
+    public void setPronunciation(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>public.roles.delete_flg</code>. 論理削除フラグ
+     * Getter for <code>public.shutos.pronunciation</code>.
      */
-    public String getDeleteFlg() {
+    public String getPronunciation() {
         return (String) get(2);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record1<Long> key() {
-        return (Record1) super.key();
     }
 
     // -------------------------------------------------------------------------
@@ -88,17 +78,17 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> implements Rec
 
     @Override
     public Field<Long> field1() {
-        return Roles.ROLES.ID;
+        return Shutos.SHUTOS.ID;
     }
 
     @Override
     public Field<String> field2() {
-        return Roles.ROLES.NAME;
+        return Shutos.SHUTOS.SHUTO_NAME;
     }
 
     @Override
     public Field<String> field3() {
-        return Roles.ROLES.DELETE_FLG;
+        return Shutos.SHUTOS.PRONUNCIATION;
     }
 
     @Override
@@ -108,12 +98,12 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> implements Rec
 
     @Override
     public String component2() {
-        return getName();
+        return getShutoName();
     }
 
     @Override
     public String component3() {
-        return getDeleteFlg();
+        return getPronunciation();
     }
 
     @Override
@@ -123,34 +113,34 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> implements Rec
 
     @Override
     public String value2() {
-        return getName();
+        return getShutoName();
     }
 
     @Override
     public String value3() {
-        return getDeleteFlg();
+        return getPronunciation();
     }
 
     @Override
-    public RolesRecord value1(Long value) {
+    public ShutosRecord value1(Long value) {
         setId(value);
         return this;
     }
 
     @Override
-    public RolesRecord value2(String value) {
-        setName(value);
+    public ShutosRecord value2(String value) {
+        setShutoName(value);
         return this;
     }
 
     @Override
-    public RolesRecord value3(String value) {
-        setDeleteFlg(value);
+    public ShutosRecord value3(String value) {
+        setPronunciation(value);
         return this;
     }
 
     @Override
-    public RolesRecord values(Long value1, String value2, String value3) {
+    public ShutosRecord values(Long value1, String value2, String value3) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -162,20 +152,20 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> implements Rec
     // -------------------------------------------------------------------------
 
     /**
-     * Create a detached RolesRecord
+     * Create a detached ShutosRecord
      */
-    public RolesRecord() {
-        super(Roles.ROLES);
+    public ShutosRecord() {
+        super(Shutos.SHUTOS);
     }
 
     /**
-     * Create a detached, initialised RolesRecord
+     * Create a detached, initialised ShutosRecord
      */
-    public RolesRecord(Long id, String name, String deleteFlg) {
-        super(Roles.ROLES);
+    public ShutosRecord(Long id, String shutoName, String pronunciation) {
+        super(Shutos.SHUTOS);
 
         setId(id);
-        setName(name);
-        setDeleteFlg(deleteFlg);
+        setShutoName(shutoName);
+        setPronunciation(pronunciation);
     }
 }

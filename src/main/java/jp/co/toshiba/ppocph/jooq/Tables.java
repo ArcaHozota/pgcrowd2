@@ -5,12 +5,14 @@ package jp.co.toshiba.ppocph.jooq;
 
 
 import jp.co.toshiba.ppocph.jooq.tables.Authorities;
+import jp.co.toshiba.ppocph.jooq.tables.Chihos;
 import jp.co.toshiba.ppocph.jooq.tables.Cities;
 import jp.co.toshiba.ppocph.jooq.tables.Districts;
 import jp.co.toshiba.ppocph.jooq.tables.EmployeeRole;
 import jp.co.toshiba.ppocph.jooq.tables.Employees;
 import jp.co.toshiba.ppocph.jooq.tables.RoleAuth;
 import jp.co.toshiba.ppocph.jooq.tables.Roles;
+import jp.co.toshiba.ppocph.jooq.tables.Shutos;
 
 
 /**
@@ -20,37 +22,47 @@ import jp.co.toshiba.ppocph.jooq.tables.Roles;
 public class Tables {
 
     /**
-     * The table <code>public.authorities</code>.
+     * 権限テーブル
      */
     public static final Authorities AUTHORITIES = Authorities.AUTHORITIES;
 
     /**
-     * The table <code>public.cities</code>.
+     * 地方テーブル
+     */
+    public static final Chihos CHIHOS = Chihos.CHIHOS;
+
+    /**
+     * 都市テーブル
      */
     public static final Cities CITIES = Cities.CITIES;
 
     /**
-     * The table <code>public.districts</code>.
+     * 地域テーブル
      */
     public static final Districts DISTRICTS = Districts.DISTRICTS;
 
     /**
-     * The table <code>public.employee_role</code>.
+     * 社員役割テーブル
      */
     public static final EmployeeRole EMPLOYEE_ROLE = EmployeeRole.EMPLOYEE_ROLE;
 
     /**
-     * The table <code>public.employees</code>.
+     * 社員テーブル
      */
     public static final Employees EMPLOYEES = Employees.EMPLOYEES;
 
     /**
-     * The table <code>public.role_auth</code>.
+     * 役割権限テーブル
      */
     public static final RoleAuth ROLE_AUTH = RoleAuth.ROLE_AUTH;
 
     /**
-     * The table <code>public.roles</code>.
+     * 役割テーブル
      */
     public static final Roles ROLES = Roles.ROLES;
+
+    /**
+     * 州都ビュー
+     */
+    public static final Shutos SHUTOS = Shutos.SHUTOS;
 }

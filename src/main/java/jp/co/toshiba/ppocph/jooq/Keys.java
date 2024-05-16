@@ -5,6 +5,7 @@ package jp.co.toshiba.ppocph.jooq;
 
 
 import jp.co.toshiba.ppocph.jooq.tables.Authorities;
+import jp.co.toshiba.ppocph.jooq.tables.Chihos;
 import jp.co.toshiba.ppocph.jooq.tables.Cities;
 import jp.co.toshiba.ppocph.jooq.tables.Districts;
 import jp.co.toshiba.ppocph.jooq.tables.EmployeeRole;
@@ -12,6 +13,7 @@ import jp.co.toshiba.ppocph.jooq.tables.Employees;
 import jp.co.toshiba.ppocph.jooq.tables.RoleAuth;
 import jp.co.toshiba.ppocph.jooq.tables.Roles;
 import jp.co.toshiba.ppocph.jooq.tables.records.AuthoritiesRecord;
+import jp.co.toshiba.ppocph.jooq.tables.records.ChihosRecord;
 import jp.co.toshiba.ppocph.jooq.tables.records.CitiesRecord;
 import jp.co.toshiba.ppocph.jooq.tables.records.DistrictsRecord;
 import jp.co.toshiba.ppocph.jooq.tables.records.EmployeeRoleRecord;
@@ -40,6 +42,8 @@ public class Keys {
     public static final UniqueKey<AuthoritiesRecord> AUTH_NAME_UNIQUE = Internal.createUniqueKey(Authorities.AUTHORITIES, DSL.name("auth_name_unique"), new TableField[] { Authorities.AUTHORITIES.NAME }, true);
     public static final UniqueKey<AuthoritiesRecord> AUTH_PKEY = Internal.createUniqueKey(Authorities.AUTHORITIES, DSL.name("auth_pkey"), new TableField[] { Authorities.AUTHORITIES.ID }, true);
     public static final UniqueKey<AuthoritiesRecord> AUTH_TITLE_UNIQUE = Internal.createUniqueKey(Authorities.AUTHORITIES, DSL.name("auth_title_unique"), new TableField[] { Authorities.AUTHORITIES.TITLE }, true);
+    public static final UniqueKey<ChihosRecord> CHIHO_NAME_UNIQUE = Internal.createUniqueKey(Chihos.CHIHOS, DSL.name("chiho_name_unique"), new TableField[] { Chihos.CHIHOS.NAME }, true);
+    public static final UniqueKey<ChihosRecord> CHIHOS_PKEY = Internal.createUniqueKey(Chihos.CHIHOS, DSL.name("chihos_pkey"), new TableField[] { Chihos.CHIHOS.ID }, true);
     public static final UniqueKey<CitiesRecord> CITIES_PKEY = Internal.createUniqueKey(Cities.CITIES, DSL.name("cities_pkey"), new TableField[] { Cities.CITIES.ID }, true);
     public static final UniqueKey<DistrictsRecord> DISTRICTS_PKEY = Internal.createUniqueKey(Districts.DISTRICTS, DSL.name("districts_pkey"), new TableField[] { Districts.DISTRICTS.ID }, true);
     public static final UniqueKey<EmployeeRoleRecord> EMPLOYEE_ROLE_PKEY = Internal.createUniqueKey(EmployeeRole.EMPLOYEE_ROLE, DSL.name("employee_role_pkey"), new TableField[] { EmployeeRole.EMPLOYEE_ROLE.EMPLOYEE_ID }, true);
@@ -55,6 +59,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final ForeignKey<CitiesRecord, DistrictsRecord> CITIES__FK_CITIES_DISTRICTS = Internal.createForeignKey(Cities.CITIES, DSL.name("fk_cities_districts"), new TableField[] { Cities.CITIES.DISTRICT_ID }, Keys.DISTRICTS_PKEY, new TableField[] { Districts.DISTRICTS.ID }, true);
+    public static final ForeignKey<DistrictsRecord, ChihosRecord> DISTRICTS__FK_DISTRICTS_CHIHOS = Internal.createForeignKey(Districts.DISTRICTS, DSL.name("fk_districts_chihos"), new TableField[] { Districts.DISTRICTS.CHIHO_ID }, Keys.CHIHOS_PKEY, new TableField[] { Chihos.CHIHOS.ID }, true);
     public static final ForeignKey<EmployeeRoleRecord, EmployeesRecord> EMPLOYEE_ROLE__FK_ER_EMPLOYEES = Internal.createForeignKey(EmployeeRole.EMPLOYEE_ROLE, DSL.name("fk_er_employees"), new TableField[] { EmployeeRole.EMPLOYEE_ROLE.EMPLOYEE_ID }, Keys.EMPLOYEE_PKEY, new TableField[] { Employees.EMPLOYEES.ID }, true);
     public static final ForeignKey<EmployeeRoleRecord, RolesRecord> EMPLOYEE_ROLE__FK_ER_ROLES = Internal.createForeignKey(EmployeeRole.EMPLOYEE_ROLE, DSL.name("fk_er_roles"), new TableField[] { EmployeeRole.EMPLOYEE_ROLE.ROLE_ID }, Keys.ROLE_PKEY, new TableField[] { Roles.ROLES.ID }, true);
     public static final ForeignKey<RoleAuthRecord, AuthoritiesRecord> ROLE_AUTH__FK_RA_AUTHORITIES = Internal.createForeignKey(RoleAuth.ROLE_AUTH, DSL.name("fk_ra_authorities"), new TableField[] { RoleAuth.ROLE_AUTH.AUTH_ID }, Keys.AUTH_PKEY, new TableField[] { Authorities.AUTHORITIES.ID }, true);

@@ -4,7 +4,7 @@
 package jp.co.toshiba.ppocph.jooq.tables.records;
 
 
-import jp.co.toshiba.ppocph.jooq.tables.EmployeeRole;
+import jp.co.toshiba.ppocph.jooq.tables.Chihos;
 
 import org.jooq.Field;
 import org.jooq.Record1;
@@ -14,39 +14,39 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * 社員役割テーブル
+ * 地方テーブル
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EmployeeRoleRecord extends UpdatableRecordImpl<EmployeeRoleRecord> implements Record2<Long, Long> {
+public class ChihosRecord extends UpdatableRecordImpl<ChihosRecord> implements Record2<Long, String> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>public.employee_role.employee_id</code>. 社員ID
+     * Setter for <code>public.chihos.id</code>. ID
      */
-    public void setEmployeeId(Long value) {
+    public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>public.employee_role.employee_id</code>. 社員ID
+     * Getter for <code>public.chihos.id</code>. ID
      */
-    public Long getEmployeeId() {
+    public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>public.employee_role.role_id</code>. 役割ID
+     * Setter for <code>public.chihos.name</code>. 地方名称
      */
-    public void setRoleId(Long value) {
+    public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>public.employee_role.role_id</code>. 役割ID
+     * Getter for <code>public.chihos.name</code>. 地方名称
      */
-    public Long getRoleId() {
-        return (Long) get(1);
+    public String getName() {
+        return (String) get(1);
     }
 
     // -------------------------------------------------------------------------
@@ -63,59 +63,59 @@ public class EmployeeRoleRecord extends UpdatableRecordImpl<EmployeeRoleRecord> 
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, Long> fieldsRow() {
+    public Row2<Long, String> fieldsRow() {
         return (Row2) super.fieldsRow();
     }
 
     @Override
-    public Row2<Long, Long> valuesRow() {
+    public Row2<Long, String> valuesRow() {
         return (Row2) super.valuesRow();
     }
 
     @Override
     public Field<Long> field1() {
-        return EmployeeRole.EMPLOYEE_ROLE.EMPLOYEE_ID;
+        return Chihos.CHIHOS.ID;
     }
 
     @Override
-    public Field<Long> field2() {
-        return EmployeeRole.EMPLOYEE_ROLE.ROLE_ID;
+    public Field<String> field2() {
+        return Chihos.CHIHOS.NAME;
     }
 
     @Override
     public Long component1() {
-        return getEmployeeId();
+        return getId();
     }
 
     @Override
-    public Long component2() {
-        return getRoleId();
+    public String component2() {
+        return getName();
     }
 
     @Override
     public Long value1() {
-        return getEmployeeId();
+        return getId();
     }
 
     @Override
-    public Long value2() {
-        return getRoleId();
+    public String value2() {
+        return getName();
     }
 
     @Override
-    public EmployeeRoleRecord value1(Long value) {
-        setEmployeeId(value);
+    public ChihosRecord value1(Long value) {
+        setId(value);
         return this;
     }
 
     @Override
-    public EmployeeRoleRecord value2(Long value) {
-        setRoleId(value);
+    public ChihosRecord value2(String value) {
+        setName(value);
         return this;
     }
 
     @Override
-    public EmployeeRoleRecord values(Long value1, Long value2) {
+    public ChihosRecord values(Long value1, String value2) {
         value1(value1);
         value2(value2);
         return this;
@@ -126,19 +126,19 @@ public class EmployeeRoleRecord extends UpdatableRecordImpl<EmployeeRoleRecord> 
     // -------------------------------------------------------------------------
 
     /**
-     * Create a detached EmployeeRoleRecord
+     * Create a detached ChihosRecord
      */
-    public EmployeeRoleRecord() {
-        super(EmployeeRole.EMPLOYEE_ROLE);
+    public ChihosRecord() {
+        super(Chihos.CHIHOS);
     }
 
     /**
-     * Create a detached, initialised EmployeeRoleRecord
+     * Create a detached, initialised ChihosRecord
      */
-    public EmployeeRoleRecord(Long employeeId, Long roleId) {
-        super(EmployeeRole.EMPLOYEE_ROLE);
+    public ChihosRecord(Long id, String name) {
+        super(Chihos.CHIHOS);
 
-        setEmployeeId(employeeId);
-        setRoleId(roleId);
+        setId(id);
+        setName(name);
     }
 }
