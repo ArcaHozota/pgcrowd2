@@ -65,7 +65,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 		if (!CommonProjectUtils.isDigital(cityId)) {
 			final DistrictDto districtDto = new DistrictDto();
 			districtDto.setId(String.valueOf(0L));
-			districtDto.setName(CommonProjectUtils.EMPTY_STRING);
+			districtDto.setName(PgCrowdConstants.DEFAULT_ROLE_NAME);
 			districtDto.setChiho(CommonProjectUtils.EMPTY_STRING);
 			districtDtos.add(districtDto);
 		} else {
