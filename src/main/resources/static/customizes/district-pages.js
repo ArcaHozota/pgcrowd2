@@ -94,7 +94,7 @@ function getChihos(element, chihoVal) {
 	$(element).empty();
 	$.ajax({
 		url: '/pgcrowd/district/getChihoList',
-		data: 'chiho=' + chihoVal,
+		data: 'chihoName=' + chihoVal,
 		type: 'GET',
 		success: function(result) {
 			$.each(result.data, (index, item) => {
