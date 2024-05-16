@@ -17,7 +17,6 @@ import jp.co.toshiba.ppocph.service.ICityService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
 import jp.co.toshiba.ppocph.utils.Pagination;
 import jp.co.toshiba.ppocph.utils.ResultDto;
-import jp.co.toshiba.ppocph.utils.SecondBeanUtils;
 import jp.co.toshiba.ppocph.utils.SnowflakeUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +59,7 @@ public final class CityServiceImpl implements ICityService {
 					.select(CITIES.ID, CITIES.NAME, CITIES.DISTRICT_ID, CITIES.PRONUNCIATION, CITIES.CITY_FLAG,
 							CITIES.POPULATION, DISTRICTS.NAME.as("districtName"))
 					.from(CITIES).innerJoin(DISTRICTS).onKey(Keys.CITIES__FK_CITIES_DISTRICTS)
-					.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+					.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(CITIES.ID.asc())
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(CityDto.class);
 			return Pagination.of(cityDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
@@ -77,7 +76,8 @@ public final class CityServiceImpl implements ICityService {
 				.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(CITIES.NAME.like(searchStr).or(CITIES.PRONUNCIATION.like(searchStr))
 						.or(DISTRICTS.NAME.like(searchStr)))
-				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(CityDto.class);
+				.orderBy(CITIES.ID.asc()).limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset)
+				.fetchInto(CityDto.class);
 		return Pagination.of(cityDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 	}
 
@@ -91,8 +91,12 @@ public final class CityServiceImpl implements ICityService {
 	@Override
 	public void save(final CityDto cityDto) {
 		final CitiesRecord citiesRecord = this.dslContext.newRecord(CITIES);
-		SecondBeanUtils.copyNullableProperties(cityDto, citiesRecord);
 		citiesRecord.setId(SnowflakeUtils.snowflakeId());
+		citiesRecord.setName(cityDto.getName());
+		citiesRecord.setPronunciation(cityDto.getPronunciation());
+		citiesRecord.setDistrictId(Long.parseLong(cityDto.getDistrictId()));
+		citiesRecord.setPopulation(cityDto.getPopulation());
+		citiesRecord.setCityFlag(cityDto.getCityFlag());
 		citiesRecord.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
 		citiesRecord.insert();
 	}
@@ -103,12 +107,18 @@ public final class CityServiceImpl implements ICityService {
 				.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(CITIES.ID.eq(Long.parseLong(cityDto.getId()))).fetchSingle();
 		final CityDto aCityDto = new CityDto();
-		SecondBeanUtils.copyNullableProperties(citiesRecord, aCityDto);
 		aCityDto.setId(citiesRecord.getId().toString());
+		aCityDto.setName(citiesRecord.getName());
+		aCityDto.setPronunciation(citiesRecord.getPronunciation());
+		aCityDto.setDistrictId(citiesRecord.getDistrictId().toString());
+		aCityDto.setPopulation(citiesRecord.getPopulation());
 		if (CommonProjectUtils.isEqual(aCityDto, cityDto)) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		}
-		SecondBeanUtils.copyNullableProperties(cityDto, citiesRecord);
+		citiesRecord.setName(cityDto.getName());
+		citiesRecord.setPronunciation(cityDto.getPronunciation());
+		citiesRecord.setDistrictId(Long.parseLong(cityDto.getDistrictId()));
+		citiesRecord.setPopulation(cityDto.getPopulation());
 		try {
 			this.dslContext.update(CITIES).set(citiesRecord)
 					.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
