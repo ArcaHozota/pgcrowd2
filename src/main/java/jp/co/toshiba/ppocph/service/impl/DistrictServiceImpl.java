@@ -122,16 +122,12 @@ public final class DistrictServiceImpl implements IDistrictService {
 		final DistrictDto aDistrictDto = new DistrictDto();
 		aDistrictDto.setId(districtsRecord.getId().toString());
 		aDistrictDto.setName(districtsRecord.getName());
-		aDistrictDto.setShutoId(districtsRecord.getShutoId().toString());
 		aDistrictDto.setChiho(districtsRecord.getChiho());
-		aDistrictDto.setDistrictFlag(districtsRecord.getDistrictFlag());
 		if (CommonProjectUtils.isEqual(aDistrictDto, districtDto)) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		}
 		districtsRecord.setName(districtDto.getName());
-		districtsRecord.setShutoId(Long.parseLong(districtDto.getShutoId()));
 		districtsRecord.setChiho(districtDto.getChiho());
-		districtsRecord.setDistrictFlag(districtDto.getDistrictFlag());
 		try {
 			this.dslContext.update(DISTRICTS).set(districtsRecord)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
