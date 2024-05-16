@@ -28,7 +28,7 @@ public final class CityDto implements Serializable {
 	/**
 	 * 都道府県ID
 	 */
-	private Long districtId;
+	private String districtId;
 
 	/**
 	 * 読み方

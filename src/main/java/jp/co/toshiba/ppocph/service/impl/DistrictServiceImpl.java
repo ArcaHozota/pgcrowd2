@@ -50,8 +50,9 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.fetchInto(DistrictsRecord.class);
 		final List<DistrictDto> districtDtos1 = districtRecords.stream().map(item -> {
 			final DistrictDto districtDto = new DistrictDto();
-			SecondBeanUtils.copyNullableProperties(item, districtDto);
 			districtDto.setId(item.getId().toString());
+			districtDto.setName(item.getName());
+			districtDto.setShutoId(item.getShutoId().toString());
 			return districtDto;
 		}).collect(Collectors.toList());
 		final DistrictDto districtDto = new DistrictDto();

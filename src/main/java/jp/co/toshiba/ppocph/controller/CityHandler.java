@@ -83,7 +83,7 @@ public class CityHandler extends ActionSupport {
 	/**
 	 * 都道府県ID
 	 */
-	private Long districtId;
+	private String districtId;
 
 	/**
 	 * 読み方

@@ -73,7 +73,7 @@ public class DistrictHandler extends ActionSupport {
 	/**
 	 * 州都ID
 	 */
-	private Long shutoId;
+	private String shutoId;
 
 	/**
 	 * 州都名称
