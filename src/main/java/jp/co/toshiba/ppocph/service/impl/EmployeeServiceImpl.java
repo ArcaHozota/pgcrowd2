@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -91,9 +92,8 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 			final EmployeesRecord employeesRecord = this.dslContext.selectFrom(EMPLOYEES)
 					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(EMPLOYEES.ID.eq(userId))
 					.fetchSingle();
-			final EmployeeDto employeeDto = new EmployeeDto(employeesRecord.getId(), employeesRecord.getLoginAccount(),
-					employeesRecord.getUsername(), employeesRecord.getPassword(), employeesRecord.getEmail(),
-					this.formatter.format(employeesRecord.getDateOfBirth()), null);
+			final EmployeeDto employeeDto = new EmployeeDto();
+			SecondBeanUtils.copyNullableProperties(employeesRecord, employeeDto);
 			employeeDtos.add(employeeDto);
 			return Pagination.of(employeeDtos, employeeDtos.size(), pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
@@ -105,10 +105,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 			final List<EmployeesRecord> employeesRecords = this.dslContext.selectFrom(EMPLOYEES)
 					.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(EmployeesRecord.class);
-			final List<EmployeeDto> employeeDtos = employeesRecords.stream()
-					.map(item -> new EmployeeDto(item.getId(), item.getLoginAccount(), item.getUsername(),
-							item.getPassword(), item.getEmail(), this.formatter.format(item.getDateOfBirth()), null))
-					.toList();
+			final List<EmployeeDto> employeeDtos = employeesRecords.stream().map(item -> {
+				final EmployeeDto employeeDto = new EmployeeDto();
+				SecondBeanUtils.copyNullableProperties(item, employeeDto);
+				employeeDto.setId(item.getId().toString());
+				return employeeDto;
+			}).collect(Collectors.toList());
 			return Pagination.of(employeeDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
 		final String searchStr = CommonProjectUtils.getDetailKeyword(keyword);
@@ -122,10 +124,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 				.and(EMPLOYEES.USERNAME.like(searchStr).or(EMPLOYEES.LOGIN_ACCOUNT.like(searchStr))
 						.or(EMPLOYEES.EMAIL.like(searchStr)))
 				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(EmployeesRecord.class);
-		final List<EmployeeDto> employeeDtos = employeesRecords.stream()
-				.map(item -> new EmployeeDto(item.getId(), item.getLoginAccount(), item.getUsername(),
-						item.getPassword(), item.getEmail(), this.formatter.format(item.getDateOfBirth()), null))
-				.toList();
+		final List<EmployeeDto> employeeDtos = employeesRecords.stream().map(item -> {
+			final EmployeeDto employeeDto = new EmployeeDto();
+			SecondBeanUtils.copyNullableProperties(item, employeeDto);
+			employeeDto.setId(item.getId().toString());
+			return employeeDto;
+		}).collect(Collectors.toList());
 		return Pagination.of(employeeDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 	}
 
