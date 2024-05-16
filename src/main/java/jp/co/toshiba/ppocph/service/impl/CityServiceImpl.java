@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  * 都市サービス実装クラス
  *
  * @author ArkamaHozota
- * @since 7.89
+ * @since 1.00beta
  */
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

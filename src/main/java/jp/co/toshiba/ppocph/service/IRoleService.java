@@ -12,7 +12,7 @@ import jp.co.toshiba.ppocph.utils.ResultDto;
  * 役割サービスインターフェス
  *
  * @author ArkamaHozota
- * @since 4.46
+ * @since 1.00beta
  */
 public interface IRoleService {
 

@@ -8,7 +8,7 @@ import jp.co.toshiba.ppocph.utils.ResultDto;
  * 都市サービスインターフェス
  *
  * @author ArkamaHozota
- * @since 7.89
+ * @since 1.00beta
  */
 public interface ICityService {
 

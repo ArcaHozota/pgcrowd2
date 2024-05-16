@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  * 地域サービス実装クラス
  *
  * @author ArkamaHozota
- * @since 7.81
+ * @since 1.00beta
  */
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
