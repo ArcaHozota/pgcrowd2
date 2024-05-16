@@ -7,7 +7,7 @@
 	<package name="basePackage"
 		extends="struts-default,json-default" strict-method-invocation="true">
 		<global-allowed-methods>initial,menuInitial,toCities,toDistricts,toMainmenu,checkDuplicated,checkEdition,
-			getDistricts,pagination,infoDelete,infoUpdate,infoSave,toAddition,toEdition,toPages,toroku,
+			checkDelete,getDistricts,pagination,infoDelete,infoUpdate,infoSave,toAddition,toEdition,toPages,toroku,
 			doAssignment,getAuthlist,getAssignedAuth,getSvgImage,getSvgImageDistrict,
 			getSvgImageCity</global-allowed-methods>
 	</package>
