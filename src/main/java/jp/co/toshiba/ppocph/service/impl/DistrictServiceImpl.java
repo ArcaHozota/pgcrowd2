@@ -23,7 +23,6 @@ import jp.co.toshiba.ppocph.service.IDistrictService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
 import jp.co.toshiba.ppocph.utils.Pagination;
 import jp.co.toshiba.ppocph.utils.ResultDto;
-import jp.co.toshiba.ppocph.utils.SecondBeanUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -53,6 +52,8 @@ public final class DistrictServiceImpl implements IDistrictService {
 			districtDto.setId(item.getId().toString());
 			districtDto.setName(item.getName());
 			districtDto.setShutoId(item.getShutoId().toString());
+			districtDto.setChiho(item.getChiho());
+			districtDto.setDistrictFlag(item.getDistrictFlag());
 			return districtDto;
 		}).collect(Collectors.toList());
 		final DistrictDto districtDto = new DistrictDto();
@@ -65,8 +66,11 @@ public final class DistrictServiceImpl implements IDistrictService {
 					.innerJoin(CITIES).onKey(Keys.CITIES__FK_CITIES_DISTRICTS)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 					.and(CITIES.ID.eq(Long.parseLong(cityId))).fetchSingle().into(DistrictsRecord.class);
-			SecondBeanUtils.copyNullableProperties(districtsRecord, districtDto);
 			districtDto.setId(districtsRecord.getId().toString());
+			districtDto.setName(districtsRecord.getName());
+			districtDto.setShutoId(districtsRecord.getShutoId().toString());
+			districtDto.setChiho(districtsRecord.getChiho());
+			districtDto.setDistrictFlag(districtsRecord.getDistrictFlag());
 		}
 		districtDtos.add(districtDto);
 		districtDtos.addAll(districtDtos1);
@@ -90,7 +94,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 							DISTRICTS.CHIHO, subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
 					.from(DISTRICTS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
 					.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
-					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(DistrictDto.class);
 			return Pagination.of(districtDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
@@ -105,7 +109,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.from(DISTRICTS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
 				.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(DISTRICTS.NAME.like(searchStr).or(CITIES.NAME.like(searchStr)))
+				.and(DISTRICTS.NAME.like(searchStr).or(CITIES.NAME.like(searchStr))).orderBy(DISTRICTS.ID.asc())
 				.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(DistrictDto.class);
 		return Pagination.of(districtDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 	}
@@ -116,12 +120,18 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle();
 		final DistrictDto aDistrictDto = new DistrictDto();
-		SecondBeanUtils.copyNullableProperties(districtsRecord, aDistrictDto);
 		aDistrictDto.setId(districtsRecord.getId().toString());
+		aDistrictDto.setName(districtsRecord.getName());
+		aDistrictDto.setShutoId(districtsRecord.getShutoId().toString());
+		aDistrictDto.setChiho(districtsRecord.getChiho());
+		aDistrictDto.setDistrictFlag(districtsRecord.getDistrictFlag());
 		if (CommonProjectUtils.isEqual(aDistrictDto, districtDto)) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		}
-		SecondBeanUtils.copyNullableProperties(districtDto, districtsRecord);
+		districtsRecord.setName(districtDto.getName());
+		districtsRecord.setShutoId(Long.parseLong(districtDto.getShutoId()));
+		districtsRecord.setChiho(districtDto.getChiho());
+		districtsRecord.setDistrictFlag(districtDto.getDistrictFlag());
 		try {
 			this.dslContext.update(DISTRICTS).set(districtsRecord)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
