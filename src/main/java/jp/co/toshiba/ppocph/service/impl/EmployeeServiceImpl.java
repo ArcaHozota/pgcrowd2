@@ -226,10 +226,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 
 	@Override
 	public ResultDto<String> update(final EmployeeDto employeeDto) {
-		String nyuryokuPassword = employeeDto.getPassword();
-		if (CommonProjectUtils.isEmpty(nyuryokuPassword)) {
-			nyuryokuPassword = CommonProjectUtils.EMPTY_STRING;
-		}
+		final String nyuryokuPassword = employeeDto.getPassword();
 		employeeDto.setPassword(null);
 		final EmployeesRecord employeesRecord = this.dslContext.selectFrom(EMPLOYEES)
 				.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
@@ -243,15 +240,18 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		aEmployeeDto.setEmail(employeesRecord.getEmail());
 		aEmployeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
-		if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)
+		if (CommonProjectUtils.isEmpty(nyuryokuPassword)) {
+			if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
+				return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
+			}
+		} else if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)
 				&& this.encoder.matches(nyuryokuPassword, employeesRecord.getPassword())) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
+		} else if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
+			employeesRecord.setPassword(this.encoder.encode(nyuryokuPassword));
 		}
 		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
 		employeesRecord.setUsername(employeeDto.getUsername());
-		if (CommonProjectUtils.isNotEmpty(nyuryokuPassword)) {
-			employeesRecord.setPassword(this.encoder.encode(nyuryokuPassword));
-		}
 		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
 		employeeRoleRecord.setRoleId(Long.parseLong(employeeDto.getRoleId()));
