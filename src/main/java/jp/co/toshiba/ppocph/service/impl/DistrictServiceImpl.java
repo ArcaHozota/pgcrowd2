@@ -18,9 +18,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import jp.co.toshiba.ppocph.common.PgCrowdConstants;
+import jp.co.toshiba.ppocph.dto.CityDto;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.jooq.Keys;
 import jp.co.toshiba.ppocph.jooq.tables.records.ChihosRecord;
+import jp.co.toshiba.ppocph.jooq.tables.records.CitiesRecord;
 import jp.co.toshiba.ppocph.jooq.tables.records.DistrictsRecord;
 import jp.co.toshiba.ppocph.service.IDistrictService;
 import jp.co.toshiba.ppocph.utils.CommonProjectUtils;
@@ -55,14 +57,23 @@ public final class DistrictServiceImpl implements IDistrictService {
 	}
 
 	@Override
-	public List<String> getDistrictCities(final DistrictDto districtDto) {
-		final List<String> shutos = new ArrayList<>();
-		final List<String> districtCities = this.dslContext.select(CITIES.NAME).from(CITIES)
+	public List<CityDto> getDistrictCities(final DistrictDto districtDto) {
+		final List<CityDto> shutos = new ArrayList<>();
+		final List<CitiesRecord> districtCities = this.dslContext.selectFrom(CITIES)
 				.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(CITIES.DISTRICT_ID.eq(Long.parseLong(districtDto.getId())))
-				.and(CITIES.NAME.ne(districtDto.getShutoName())).orderBy(CITIES.ID.asc()).fetchInto(String.class);
-		shutos.add(districtDto.getShutoName());
-		shutos.addAll(districtCities);
+				.and(CITIES.DISTRICT_ID.eq(Long.parseLong(districtDto.getId()))).orderBy(CITIES.ID.asc())
+				.fetchInto(CitiesRecord.class);
+		final List<CityDto> cityDtos = districtCities.stream().map(item -> {
+			final CityDto cityDto = new CityDto();
+			cityDto.setId(item.getId().toString());
+			cityDto.setName(item.getName());
+			return cityDto;
+		}).filter(a -> CommonProjectUtils.isNotEqual(a.getId(), districtDto.getShutoId())).collect(Collectors.toList());
+		final CityDto cityDto = new CityDto();
+		cityDto.setId(districtDto.getShutoId());
+		cityDto.setName(districtDto.getShutoName());
+		shutos.add(cityDto);
+		shutos.addAll(cityDtos);
 		return shutos;
 	}
 
@@ -137,8 +148,9 @@ public final class DistrictServiceImpl implements IDistrictService {
 
 	@Override
 	public ResultDto<String> update(final DistrictDto districtDto) {
-		final DistrictDto aDistrictDto = this.dslContext.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chiho"))
-				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS)
+		final DistrictDto aDistrictDto = this.dslContext
+				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CHIHOS.NAME.as("chiho")).from(DISTRICTS)
+				.innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS)
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle().into(DistrictDto.class);
 		if (CommonProjectUtils.isEqual(aDistrictDto, districtDto)) {
@@ -151,6 +163,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.where(CHIHOS.NAME.eq(districtDto.getChiho())).fetchSingle();
 		districtsRecord.setName(districtDto.getName());
 		districtsRecord.setChihoId(chihosRecord.getId());
+		districtsRecord.setShutoId(Long.parseLong(districtDto.getShutoId()));
 		try {
 			this.dslContext.update(DISTRICTS).set(districtsRecord)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))

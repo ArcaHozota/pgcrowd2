@@ -2,6 +2,7 @@ package jp.co.toshiba.ppocph.service;
 
 import java.util.List;
 
+import jp.co.toshiba.ppocph.dto.CityDto;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.utils.Pagination;
 import jp.co.toshiba.ppocph.utils.ResultDto;
@@ -28,7 +29,7 @@ public interface IDistrictService {
 	 * @param districtDto 地域情報転送クラス
 	 * @return List<String>
 	 */
-	List<String> getDistrictCities(DistrictDto districtDto);
+	List<CityDto> getDistrictCities(DistrictDto districtDto);
 
 	/**
 	 * 都市IDによって地域一覧を取得する

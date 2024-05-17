@@ -81,7 +81,8 @@ $("#districtInfoChangeBtn").on('click', function() {
 		let putData = JSON.stringify({
 			'id': this.value,
 			'name': $("#nameEdit").val().trim(),
-			'chiho': $("#chihoEdit").val().trim()
+			'chiho': $("#chihoEdit").val().trim(),
+			'shutoId': $("#shutoEdit").val().trim()
 		});
 		pgcrowdAjaxModify('/pgcrowd/district/infoUpdate', 'PUT', putData, districtPutSuccessFunction);
 	}
@@ -122,7 +123,7 @@ function getShutos(element, editId, shutoVal) {
 		contentType: 'application/json;charset=UTF-8',
 		success: function(result) {
 			$.each(result.data, (index, item) => {
-				let optionElement = $("<option></option>").attr('value', item).text(item);
+				let optionElement = $("<option></option>").attr('value', item.id).text(item.name);
 				optionElement.appendTo(element);
 			});
 		}

@@ -21,6 +21,7 @@ import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 
 import jp.co.toshiba.ppocph.common.PgCrowdURLConstants;
+import jp.co.toshiba.ppocph.dto.CityDto;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.service.IDistrictService;
 import jp.co.toshiba.ppocph.utils.Pagination;
@@ -147,7 +148,7 @@ public class DistrictHandler extends ActionSupport {
 	@Action(value = PgCrowdURLConstants.URL_SHUTO_LIST, interceptorRefs = { @InterceptorRef("json") })
 	public String getShutos() {
 		final DistrictDto districtDto2 = this.getDistrictDto();
-		final List<String> shutos = this.iDistrictService.getDistrictCities(districtDto2);
+		final List<CityDto> shutos = this.iDistrictService.getDistrictCities(districtDto2);
 		this.setResponsedJsondata(ResultDto.successWithData(shutos));
 		return NONE;
 	}
