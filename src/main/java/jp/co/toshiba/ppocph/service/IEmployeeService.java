@@ -30,8 +30,10 @@ public interface IEmployeeService {
 	/**
 	 * キーワードによって社員情報を取得する
 	 *
-	 * @param pageNum ページ数
-	 * @param keyword キーワード
+	 * @param pageNum     ページ数
+	 * @param keyword     キーワード
+	 * @param authChkFlag 権限フラグ
+	 * @param userId      社員ID
 	 * @return Pagination<Employee>
 	 */
 	Pagination<EmployeeDto> getEmployeesByKeyword(Integer pageNum, String keyword, Long userId, String authChkFlag);
