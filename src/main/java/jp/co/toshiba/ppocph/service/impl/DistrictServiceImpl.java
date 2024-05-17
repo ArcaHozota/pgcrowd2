@@ -64,17 +64,17 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.and(CITIES.DISTRICT_ID.eq(Long.parseLong(districtDto.getId()))).orderBy(CITIES.ID.asc())
 				.fetchInto(CitiesRecord.class);
 		final List<CityDto> cityDtos = districtCities.stream().map(item -> {
-			final CityDto cityDto = new CityDto();
-			cityDto.setId(item.getId().toString());
-			cityDto.setName(item.getName());
-			return cityDto;
-		}).filter(a -> CommonProjectUtils.isNotEqual(a.getId(), districtDto.getShutoId())).collect(Collectors.toList());
-		final CityDto cityDto = new CityDto();
-		cityDto.setId(districtDto.getShutoId());
-		cityDto.setName(districtDto.getShutoName());
+			final CityDto aCityDto = new CityDto();
+			aCityDto.setId(item.getId().toString());
+			aCityDto.setName(item.getName());
+			return aCityDto;
+		}).collect(Collectors.toList());
+		final CityDto cityDto = cityDtos.stream()
+				.filter(a -> CommonProjectUtils.isEqual(a.getName(), districtDto.getShutoName()))
+				.collect(Collectors.toList()).get(0);
 		shutos.add(cityDto);
 		shutos.addAll(cityDtos);
-		return shutos;
+		return shutos.stream().distinct().collect(Collectors.toList());
 	}
 
 	@Override
