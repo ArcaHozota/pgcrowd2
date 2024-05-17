@@ -23,6 +23,14 @@ public interface IDistrictService {
 	List<String> getDistrictChihos(String chiho);
 
 	/**
+	 * 地域都市リストを取得する
+	 *
+	 * @param districtDto 地域情報転送クラス
+	 * @return List<String>
+	 */
+	List<String> getDistrictCities(DistrictDto districtDto);
+
+	/**
 	 * 都市IDによって地域一覧を取得する
 	 *
 	 * @param cityId 都市ID

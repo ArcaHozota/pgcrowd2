@@ -55,6 +55,18 @@ public final class DistrictServiceImpl implements IDistrictService {
 	}
 
 	@Override
+	public List<String> getDistrictCities(final DistrictDto districtDto) {
+		final List<String> shutos = new ArrayList<>();
+		final List<String> districtCities = this.dslContext.select(CITIES.NAME).from(CITIES)
+				.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+				.and(CITIES.DISTRICT_ID.eq(Long.parseLong(districtDto.getId())))
+				.and(CITIES.NAME.ne(districtDto.getShutoName())).fetchInto(String.class);
+		shutos.add(districtDto.getShutoName());
+		shutos.addAll(districtCities);
+		return shutos;
+	}
+
+	@Override
 	public List<DistrictDto> getDistrictsByCityId(final String cityId) {
 		final List<DistrictDto> districtDtos = new ArrayList<>();
 		final List<DistrictDto> districtDtos1 = this.dslContext

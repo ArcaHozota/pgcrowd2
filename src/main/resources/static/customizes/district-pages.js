@@ -64,7 +64,7 @@ $("#tableBody").on('click', '.edit-btn', function() {
 	let populationVal = $(this).parent().parent().find("td:eq(3)").text();
 	$("#nameEdit").val(nameVal);
 	getChihos("#chihoEdit", chihoVal);
-	getShutos("#shutoEdit", shutoVal);
+	getShutos("#shutoEdit", editId, shutoVal);
 	$("#populationEdit").text(populationVal);
 	$("#districtEditModal").modal({
 		backdrop: 'static'
@@ -104,12 +104,17 @@ function getChihos(element, chihoVal) {
 		}
 	});
 }
-function getShutos(element, shutoVal) {
+function getShutos(element, editId, shutoVal) {
 	$(element).empty();
 	$.ajax({
 		url: '/pgcrowd/district/getShutoList',
-		data: 'shutoName=' + shutoVal,
-		type: 'GET',
+		type: 'POST',
+		data: JSON.stringify({
+			'id': editId,
+			'shutoName': shutoVal
+		}),
+		dataType: 'json',
+		contentType: 'application/json;charset=UTF-8',
 		success: function(result) {
 			$.each(result.data, (index, item) => {
 				let optionElement = $("<option></option>").attr('value', item).text(item);

@@ -143,10 +143,10 @@ public class DistrictHandler extends ActionSupport {
 	 *
 	 * @return String
 	 */
-	@Action(PgCrowdURLConstants.URL_SHUTO_LIST)
+	@Action(value = PgCrowdURLConstants.URL_SHUTO_LIST, interceptorRefs = { @InterceptorRef("json") })
 	public String getShutos() {
-		final String shuto = ActionContext.getContext().getServletRequest().getParameter("shutoName");
-		final List<String> shutos = this.iDistrictService.getDistrictCities(shuto);
+		final DistrictDto districtDto2 = this.getDistrictDto();
+		final List<String> shutos = this.iDistrictService.getDistrictCities(districtDto2);
 		this.setResponsedJsondata(ResultDto.successWithData(shutos));
 		return NONE;
 	}
