@@ -105,10 +105,15 @@ function getChihos(element, chihoVal) {
 	});
 }
 function getShutos(element, editId, shutoVal) {
+	let header = $('meta[name=_csrf_header]').attr('content');
+	let token = $('meta[name=_csrf_token]').attr('content');
 	$(element).empty();
 	$.ajax({
 		url: '/pgcrowd/district/getShutoList',
 		type: 'POST',
+		headers: {
+			[header]: token
+		},
 		data: JSON.stringify({
 			'id': editId,
 			'shutoName': shutoVal
