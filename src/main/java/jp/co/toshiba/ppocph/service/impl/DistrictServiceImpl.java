@@ -60,7 +60,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 		final List<String> districtCities = this.dslContext.select(CITIES.NAME).from(CITIES)
 				.where(CITIES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(CITIES.DISTRICT_ID.eq(Long.parseLong(districtDto.getId())))
-				.and(CITIES.NAME.ne(districtDto.getShutoName())).fetchInto(String.class);
+				.and(CITIES.NAME.ne(districtDto.getShutoName())).orderBy(CITIES.ID.asc()).fetchInto(String.class);
 		shutos.add(districtDto.getShutoName());
 		shutos.addAll(districtCities);
 		return shutos;

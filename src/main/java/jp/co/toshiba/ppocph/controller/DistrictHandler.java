@@ -143,6 +143,7 @@ public class DistrictHandler extends ActionSupport {
 	 *
 	 * @return String
 	 */
+	@PreAuthorize("hasAuthority('district%retrieve')")
 	@Action(value = PgCrowdURLConstants.URL_SHUTO_LIST, interceptorRefs = { @InterceptorRef("json") })
 	public String getShutos() {
 		final DistrictDto districtDto2 = this.getDistrictDto();
