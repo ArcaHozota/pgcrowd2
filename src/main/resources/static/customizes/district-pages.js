@@ -63,9 +63,9 @@ $("#tableBody").on('click', '.edit-btn', function() {
 	let chihoVal = $(this).parent().parent().find("td:eq(2)").text();
 	let populationVal = $(this).parent().parent().find("td:eq(3)").text();
 	$("#nameEdit").val(nameVal);
-	$("#shutoEdit").text(shutoVal);
-	$("#populationEdit").text(populationVal);
 	getChihos("#chihoEdit", chihoVal);
+	getShutos("#shutoEdit", shutoVal);
+	$("#populationEdit").text(populationVal);
 	$("#districtEditModal").modal({
 		backdrop: 'static'
 	});
@@ -95,6 +95,20 @@ function getChihos(element, chihoVal) {
 	$.ajax({
 		url: '/pgcrowd/district/getChihoList',
 		data: 'chihoName=' + chihoVal,
+		type: 'GET',
+		success: function(result) {
+			$.each(result.data, (index, item) => {
+				let optionElement = $("<option></option>").attr('value', item).text(item);
+				optionElement.appendTo(element);
+			});
+		}
+	});
+}
+function getShutos(element, shutoVal) {
+	$(element).empty();
+	$.ajax({
+		url: '/pgcrowd/district/getShutoList',
+		data: 'shutoName=' + shutoVal,
 		type: 'GET',
 		success: function(result) {
 			$.each(result.data, (index, item) => {

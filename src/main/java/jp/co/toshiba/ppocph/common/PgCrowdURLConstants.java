@@ -74,6 +74,8 @@ public final class PgCrowdURLConstants {
 
 	public static final String URL_CHIHO_LIST = "getChihoList";
 
+	public static final String URL_SHUTO_LIST = "getShutoList";
+
 	public static final String URL_CITY_FLAGS = "getCityFlags";
 
 	public static final String URL_DISTRICT_FLAGS = "getFlags";

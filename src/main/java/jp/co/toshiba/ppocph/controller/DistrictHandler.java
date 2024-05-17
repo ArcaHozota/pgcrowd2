@@ -110,7 +110,7 @@ public class DistrictHandler extends ActionSupport {
 	}
 
 	/**
-	 * 情報一覧画面初期表示する
+	 * 地方情報を取得する
 	 *
 	 * @return String
 	 */
@@ -136,6 +136,19 @@ public class DistrictHandler extends ActionSupport {
 		this.districtDto.setPopulation(this.getPopulation());
 		this.districtDto.setDistrictFlag(this.getDistrictFlag());
 		return this.districtDto;
+	}
+
+	/**
+	 * 地域都市一覧を取得する
+	 *
+	 * @return String
+	 */
+	@Action(PgCrowdURLConstants.URL_SHUTO_LIST)
+	public String getShutos() {
+		final String shuto = ActionContext.getContext().getServletRequest().getParameter("shutoName");
+		final List<String> shutos = this.iDistrictService.getDistrictCities(shuto);
+		this.setResponsedJsondata(ResultDto.successWithData(shutos));
+		return NONE;
 	}
 
 	/**
