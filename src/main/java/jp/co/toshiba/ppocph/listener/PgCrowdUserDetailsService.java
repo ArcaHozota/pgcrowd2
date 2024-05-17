@@ -5,6 +5,7 @@ import static jp.co.toshiba.ppocph.jooq.Tables.EMPLOYEES;
 import static jp.co.toshiba.ppocph.jooq.Tables.EMPLOYEE_ROLE;
 import static jp.co.toshiba.ppocph.jooq.Tables.ROLE_AUTH;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,12 @@ public class PgCrowdUserDetailsService implements UserDetailsService {
 		}
 		final EmployeeDto employeeDto = new EmployeeDto();
 		employeeDto.setId(employeesRecord.getId().toString());
+		employeeDto.setLoginAccount(employeesRecord.getLoginAccount());
 		employeeDto.setUsername(employeesRecord.getUsername());
+		employeeDto.setPassword(employeesRecord.getPassword());
+		employeeDto.setEmail(employeesRecord.getEmail());
+		employeeDto.setDateOfBirth(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(employeesRecord.getDateOfBirth()));
+		employeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
 		final List<SimpleGrantedAuthority> authorities = authoritiesRecords.stream()
 				.map(item -> new SimpleGrantedAuthority(item.getName())).collect(Collectors.toList());
 		return new SecurityAdmin(employeeDto, authorities);
