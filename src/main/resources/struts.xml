@@ -8,7 +8,7 @@
 		extends="struts-default,json-default" strict-method-invocation="true">
 		<global-allowed-methods>initial,menuInitial,toCities,toDistricts,toMainmenu,checkDuplicated,checkEdition,
 			checkDelete,getDistricts,pagination,infoDelete,infoUpdate,infoSave,toAddition,toEdition,toPages,toroku,
-			doAssignment,getChihos,getAuths,getAssignedAuths,getSvgImage,getSvgImageDistrict,
+			doAssignment,getChihos,getShutos,getAuths,getAssignedAuths,getSvgImage,getSvgImageDistrict,
 			getSvgImageCity</global-allowed-methods>
 	</package>
 	<constant
