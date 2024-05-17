@@ -69,13 +69,13 @@
 	                    <div class="form-group row">
 	                        <label for="shutoEdit" class="col-sm-3 col-form-label text-right">州都</label>
 	                        <div class="col-sm-9" style="height: 5.7vh;">
-	                            <p type="text" class="form-control" id="shutoEdit"></p>
+	                            <select class="custom-select" id="shutoEdit"></select>
 	                        </div>
 	                    </div>
 	                    <div class="form-group row">
 	                        <label for="chihoEdit" class="col-sm-3 col-form-label text-right">地方</label>
 	                        <div class="col-sm-9" style="height: 5.7vh;">
-	                            <select id="chihoEdit" class="custom-select"></select>
+	                            <select class="custom-select" id="chihoEdit"></select>
 	                        </div>
 	                    </div>
 	                    <div class="form-group row">
