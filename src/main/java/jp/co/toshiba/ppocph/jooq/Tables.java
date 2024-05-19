@@ -12,7 +12,6 @@ import jp.co.toshiba.ppocph.jooq.tables.EmployeeRole;
 import jp.co.toshiba.ppocph.jooq.tables.Employees;
 import jp.co.toshiba.ppocph.jooq.tables.RoleAuth;
 import jp.co.toshiba.ppocph.jooq.tables.Roles;
-import jp.co.toshiba.ppocph.jooq.tables.Shutos;
 
 
 /**
@@ -60,9 +59,4 @@ public class Tables {
      * 役割テーブル
      */
     public static final Roles ROLES = Roles.ROLES;
-
-    /**
-     * 州都ビュー
-     */
-    public static final Shutos SHUTOS = Shutos.SHUTOS;
 }

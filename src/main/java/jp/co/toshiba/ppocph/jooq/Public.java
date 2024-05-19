@@ -15,7 +15,6 @@ import jp.co.toshiba.ppocph.jooq.tables.EmployeeRole;
 import jp.co.toshiba.ppocph.jooq.tables.Employees;
 import jp.co.toshiba.ppocph.jooq.tables.RoleAuth;
 import jp.co.toshiba.ppocph.jooq.tables.Roles;
-import jp.co.toshiba.ppocph.jooq.tables.Shutos;
 
 import org.jooq.Catalog;
 import org.jooq.Table;
@@ -76,11 +75,6 @@ public class Public extends SchemaImpl {
     public final Roles ROLES = Roles.ROLES;
 
     /**
-     * 州都ビュー
-     */
-    public final Shutos SHUTOS = Shutos.SHUTOS;
-
-    /**
      * No further instances allowed
      */
     private Public() {
@@ -103,7 +97,6 @@ public class Public extends SchemaImpl {
             EmployeeRole.EMPLOYEE_ROLE,
             Employees.EMPLOYEES,
             RoleAuth.ROLE_AUTH,
-            Roles.ROLES,
-            Shutos.SHUTOS);
+            Roles.ROLES);
     }
 }
