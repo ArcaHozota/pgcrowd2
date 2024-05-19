@@ -3,7 +3,6 @@ package jp.co.toshiba.ppocph.service.impl;
 import static jp.co.toshiba.ppocph.jooq.Tables.CHIHOS;
 import static jp.co.toshiba.ppocph.jooq.Tables.CITIES;
 import static jp.co.toshiba.ppocph.jooq.Tables.DISTRICTS;
-import static jp.co.toshiba.ppocph.jooq.Tables.SHUTOS;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -113,14 +112,14 @@ public final class DistrictServiceImpl implements IDistrictService {
 		final int offset = (pageNum - 1) * PgCrowdConstants.DEFAULT_PAGE_SIZE;
 		if (CommonProjectUtils.isEmpty(keyword)) {
 			final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CHIHOS)
-					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS).on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID))
+					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID))
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).fetchSingle()
 					.into(Integer.class);
 			final List<DistrictDto> districtDtos = this.dslContext
-					.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, SHUTOS.SHUTO_NAME,
+					.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
 							CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
-					.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS)
-					.on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
+					.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
+					.on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
 					.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(DistrictDto.class);
@@ -128,19 +127,18 @@ public final class DistrictServiceImpl implements IDistrictService {
 		}
 		final String searchStr = CommonProjectUtils.getDetailKeyword(keyword);
 		final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CHIHOS)
-				.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS).on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID))
-				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).and(DISTRICTS.NAME
-						.like(searchStr).or(CHIHOS.NAME.like(searchStr)).or(SHUTOS.SHUTO_NAME.like(searchStr)))
+				.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID))
+				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
+				.and(DISTRICTS.NAME.like(searchStr).or(CHIHOS.NAME.like(searchStr)).or(CITIES.NAME.like(searchStr)))
 				.fetchSingle().into(Integer.class);
 		final List<DistrictDto> districtDtos = this.dslContext
-				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, SHUTOS.SHUTO_NAME, CHIHOS.NAME.as("chiho"),
-						subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
-				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(SHUTOS)
-				.on(SHUTOS.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
+				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
+						CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
+				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
+				.on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
 				.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(DISTRICTS.NAME.like(searchStr).or(CHIHOS.NAME.like(searchStr))
-						.or(SHUTOS.SHUTO_NAME.like(searchStr)))
+				.and(DISTRICTS.NAME.like(searchStr).or(CHIHOS.NAME.like(searchStr)).or(CITIES.NAME.like(searchStr)))
 				.orderBy(DISTRICTS.ID.asc()).limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset)
 				.fetchInto(DistrictDto.class);
 		return Pagination.of(districtDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
