@@ -40,7 +40,7 @@ public class CSPNonceFilter extends GenericFilterBean {
 		}
 	}
 
-	private static final int NONCE_SIZE = 32; // Recommended size is at least 128 bits/16 bytes
+	private static final int NONCE_SIZE = 24; // Recommended size is at least 128 bits/16 bytes
 	private static final String CSP_NONCE_ATTRIBUTE = "cspNonce";
 
 	private final SecureRandom secureRandom = new SecureRandom();
