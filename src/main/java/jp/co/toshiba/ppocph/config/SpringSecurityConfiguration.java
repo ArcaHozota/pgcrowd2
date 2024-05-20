@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -63,8 +64,8 @@ public class SpringSecurityConfiguration {
 	@Bean
 	@Order(2)
 	protected SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-		http.authorizeRequests(
-				requests -> requests
+		http.addFilterBefore(new CSPNonceFilter(), HeaderWriterFilter.class)
+				.authorizeRequests(requests -> requests
 						.antMatchers(PgCrowdURLConstants.URL_STATIC_RESOURCE,
 								PgCrowdURLConstants.URL_EMPLOYEE_NAMESPACE.concat("/")
 										.concat(PgCrowdURLConstants.URL_REGISTER))
@@ -97,8 +98,7 @@ public class SpringSecurityConfiguration {
 								.concat(PgCrowdURLConstants.URL_LOG_OUT))
 						.logoutSuccessUrl(PgCrowdURLConstants.URL_EMPLOYEE_NAMESPACE.concat("/")
 								.concat(PgCrowdURLConstants.URL_TO_LOGIN)))
-				.headers(headers -> headers
-						.contentSecurityPolicy("script-src 'nonce-Ytvk0lE3pg1BL713YR9i89Kn' 'strict-dynamic'"))
+				.headers(headers -> headers.contentSecurityPolicy("script-src 'nonce-{nonce}' 'strict-dynamic'"))
 				.rememberMe(remember -> remember.key(UUID.randomUUID().toString())
 						.tokenValiditySeconds(PgCrowdConstants.DEFAULT_TOKEN_EXPIRED));
 		log.info(PgCrowdConstants.MESSAGE_SPRING_SECURITY);
