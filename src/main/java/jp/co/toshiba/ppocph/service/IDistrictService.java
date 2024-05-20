@@ -19,10 +19,10 @@ public interface IDistrictService {
 	/**
 	 * 地方リストを取得する
 	 *
-	 * @param chihoId 地方ID
+	 * @param chiho 地方名称
 	 * @return List<String>
 	 */
-	List<ChihoDto> getDistrictChihos(String chihoId);
+	List<ChihoDto> getDistrictChihos(String chiho);
 
 	/**
 	 * 地域都市リストを取得する

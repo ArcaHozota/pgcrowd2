@@ -47,7 +47,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 	private final DSLContext dslContext;
 
 	@Override
-	public List<ChihoDto> getDistrictChihos(final String chihoId) {
+	public List<ChihoDto> getDistrictChihos(final String chiho) {
 		final List<ChihoDto> chihoList = new ArrayList<>();
 		final List<ChihosRecord> chihosRecords = this.dslContext.selectDistinct(CHIHOS.fields()).from(CHIHOS)
 				.orderBy(CHIHOS.ID.asc()).fetchInto(ChihosRecord.class);
@@ -57,10 +57,10 @@ public final class DistrictServiceImpl implements IDistrictService {
 			chihoDto.setName(item.getName());
 			return chihoDto;
 		}).collect(Collectors.toList());
-		chihoList.add(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getId(), chihoId))
-				.collect(Collectors.toList()).get(0));
+		chihoList.addAll(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getName(), chiho))
+				.collect(Collectors.toList()));
 		chihoList.addAll(chihos);
-		return chihoList;
+		return chihoList.stream().distinct().collect(Collectors.toList());
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 	public List<DistrictDto> getDistrictsByCityId(final String cityId) {
 		final List<DistrictDto> districtDtos = new ArrayList<>();
 		final List<DistrictDto> districtDtos1 = this.dslContext
-				.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chiho")).from(DISTRICTS).innerJoin(CHIHOS)
+				.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chihoName")).from(DISTRICTS).innerJoin(CHIHOS)
 				.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS)
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
 				.fetchInto(DistrictDto.class);
@@ -96,11 +96,11 @@ public final class DistrictServiceImpl implements IDistrictService {
 			final DistrictDto districtDto = new DistrictDto();
 			districtDto.setId(String.valueOf(0L));
 			districtDto.setName(PgCrowdConstants.DEFAULT_ROLE_NAME);
-			districtDto.setChiho(CommonProjectUtils.EMPTY_STRING);
+			districtDto.setChihoName(CommonProjectUtils.EMPTY_STRING);
 			districtDtos.add(districtDto);
 		} else {
 			final DistrictDto districtDto = this.dslContext
-					.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chiho")).from(DISTRICTS).innerJoin(CHIHOS)
+					.select(DISTRICTS.ID, DISTRICTS.NAME, CHIHOS.NAME.as("chihoName")).from(DISTRICTS).innerJoin(CHIHOS)
 					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
 					.onKey(Keys.CITIES__FK_CITIES_DISTRICTS)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
@@ -126,7 +126,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 					.into(Integer.class);
 			final List<DistrictDto> districtDtos = this.dslContext
 					.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
-							CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
+							CHIHOS.NAME.as("chihoName"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
 					.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
 					.onKey(Keys.DISTRICTS__FK_DISTRICTS_SHUTOS).innerJoin(subQueryTable)
 					.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
@@ -142,7 +142,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.fetchSingle().into(Integer.class);
 		final List<DistrictDto> districtDtos = this.dslContext
 				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
-						CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
+						CHIHOS.NAME.as("chihoName"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
 				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
 				.onKey(Keys.DISTRICTS__FK_DISTRICTS_SHUTOS).innerJoin(subQueryTable)
 				.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
@@ -155,21 +155,19 @@ public final class DistrictServiceImpl implements IDistrictService {
 
 	@Override
 	public ResultDto<String> update(final DistrictDto districtDto) {
-		final DistrictDto aDistrictDto = this.dslContext
-				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CHIHOS.NAME.as("chiho")).from(DISTRICTS)
-				.innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS)
-				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
-				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle().into(DistrictDto.class);
-		if (CommonProjectUtils.isEqual(aDistrictDto, districtDto)) {
-			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
-		}
 		final DistrictsRecord districtsRecord = this.dslContext.selectFrom(DISTRICTS)
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(DISTRICTS.ID.eq(Long.parseLong(districtDto.getId()))).fetchSingle();
-		final ChihosRecord chihosRecord = this.dslContext.selectFrom(CHIHOS)
-				.where(CHIHOS.NAME.eq(districtDto.getChiho())).fetchSingle();
+		final DistrictDto aDistrictDto = new DistrictDto();
+		aDistrictDto.setId(districtsRecord.getId().toString());
+		aDistrictDto.setName(districtsRecord.getName());
+		aDistrictDto.setChihoId(districtsRecord.getChihoId().toString());
+		aDistrictDto.setShutoId(districtsRecord.getShutoId().toString());
+		if (CommonProjectUtils.isEqual(aDistrictDto, districtDto)) {
+			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
+		}
 		districtsRecord.setName(districtDto.getName());
-		districtsRecord.setChihoId(chihosRecord.getId());
+		districtsRecord.setChihoId(Long.parseLong(districtDto.getChihoId()));
 		districtsRecord.setShutoId(Long.parseLong(districtDto.getShutoId()));
 		try {
 			this.dslContext.update(DISTRICTS).set(districtsRecord)

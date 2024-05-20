@@ -85,9 +85,9 @@ public class DistrictHandler extends ActionSupport {
 	private String shutoName;
 
 	/**
-	 * 地方名称
+	 * 地方ID
 	 */
-	private String chiho;
+	private String chihoId;
 
 	/**
 	 * 人口数量
@@ -118,8 +118,8 @@ public class DistrictHandler extends ActionSupport {
 	 */
 	@Action(PgCrowdURLConstants.URL_CHIHO_LIST)
 	public String getChihos() {
-		final String chihoId = ActionContext.getContext().getServletRequest().getParameter("chihoId");
-		final List<ChihoDto> chihos = this.iDistrictService.getDistrictChihos(chihoId);
+		final String chiho = ActionContext.getContext().getServletRequest().getParameter("chihoName");
+		final List<ChihoDto> chihos = this.iDistrictService.getDistrictChihos(chiho);
 		this.setResponsedJsondata(ResultDto.successWithData(chihos));
 		return NONE;
 	}
@@ -132,7 +132,7 @@ public class DistrictHandler extends ActionSupport {
 	private DistrictDto getDistrictDto() {
 		this.districtDto.setId(this.getId());
 		this.districtDto.setName(this.getName());
-		this.districtDto.setChiho(this.getChiho());
+		this.districtDto.setChihoId(this.getChihoId());
 		this.districtDto.setShutoId(this.getShutoId());
 		this.districtDto.setShutoName(this.getShutoName());
 		this.districtDto.setPopulation(this.getPopulation());
