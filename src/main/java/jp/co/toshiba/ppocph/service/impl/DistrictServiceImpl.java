@@ -17,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import jp.co.toshiba.ppocph.common.PgCrowdConstants;
+import jp.co.toshiba.ppocph.dto.ChihoDto;
 import jp.co.toshiba.ppocph.dto.CityDto;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.jooq.Keys;
@@ -46,11 +47,18 @@ public final class DistrictServiceImpl implements IDistrictService {
 	private final DSLContext dslContext;
 
 	@Override
-	public List<String> getDistrictChihos(final String chiho) {
-		final List<String> chihoList = new ArrayList<>();
-		final List<String> chihos = this.dslContext.selectDistinct(CHIHOS.NAME).from(CHIHOS)
-				.where(CHIHOS.NAME.ne(chiho)).fetchInto(String.class);
-		chihoList.add(chiho);
+	public List<ChihoDto> getDistrictChihos(final String chihoId) {
+		final List<ChihoDto> chihoList = new ArrayList<>();
+		final List<ChihosRecord> chihosRecords = this.dslContext.selectDistinct(CHIHOS.fields()).from(CHIHOS)
+				.orderBy(CHIHOS.ID.asc()).fetchInto(ChihosRecord.class);
+		final List<ChihoDto> chihos = chihosRecords.stream().map(item -> {
+			final ChihoDto chihoDto = new ChihoDto();
+			chihoDto.setId(item.getId().toString());
+			chihoDto.setName(item.getName());
+			return chihoDto;
+		}).collect(Collectors.toList());
+		chihoList.add(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getId(), chihoId))
+				.collect(Collectors.toList()).get(0));
 		chihoList.addAll(chihos);
 		return chihoList;
 	}

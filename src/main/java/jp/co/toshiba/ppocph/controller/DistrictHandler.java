@@ -21,6 +21,7 @@ import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 
 import jp.co.toshiba.ppocph.common.PgCrowdURLConstants;
+import jp.co.toshiba.ppocph.dto.ChihoDto;
 import jp.co.toshiba.ppocph.dto.CityDto;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.service.IDistrictService;
@@ -117,8 +118,8 @@ public class DistrictHandler extends ActionSupport {
 	 */
 	@Action(PgCrowdURLConstants.URL_CHIHO_LIST)
 	public String getChihos() {
-		final String chiho = ActionContext.getContext().getServletRequest().getParameter("chihoName");
-		final List<String> chihos = this.iDistrictService.getDistrictChihos(chiho);
+		final String chihoId = ActionContext.getContext().getServletRequest().getParameter("chihoId");
+		final List<ChihoDto> chihos = this.iDistrictService.getDistrictChihos(chihoId);
 		this.setResponsedJsondata(ResultDto.successWithData(chihos));
 		return NONE;
 	}

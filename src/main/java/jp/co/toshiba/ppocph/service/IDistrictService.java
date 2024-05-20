@@ -2,6 +2,7 @@ package jp.co.toshiba.ppocph.service;
 
 import java.util.List;
 
+import jp.co.toshiba.ppocph.dto.ChihoDto;
 import jp.co.toshiba.ppocph.dto.CityDto;
 import jp.co.toshiba.ppocph.dto.DistrictDto;
 import jp.co.toshiba.ppocph.utils.Pagination;
@@ -18,10 +19,10 @@ public interface IDistrictService {
 	/**
 	 * 地方リストを取得する
 	 *
-	 * @param chiho 地方名称
+	 * @param chihoId 地方ID
 	 * @return List<String>
 	 */
-	List<String> getDistrictChihos(String chiho);
+	List<ChihoDto> getDistrictChihos(String chihoId);
 
 	/**
 	 * 地域都市リストを取得する
