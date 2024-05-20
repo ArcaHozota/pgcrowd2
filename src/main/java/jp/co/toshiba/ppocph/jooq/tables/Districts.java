@@ -127,16 +127,24 @@ public class Districts extends TableImpl<DistrictsRecord> {
 
     @Override
     public List<ForeignKey<DistrictsRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<DistrictsRecord, ?>>asList(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS);
+        return Arrays.<ForeignKey<DistrictsRecord, ?>>asList(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS, Keys.DISTRICTS__FK_DISTRICTS_SHUTOS);
     }
 
     private transient Chihos _chihos;
+    private transient Cities _cities;
 
     public Chihos chihos() {
         if (_chihos == null)
             _chihos = new Chihos(this, Keys.DISTRICTS__FK_DISTRICTS_CHIHOS);
 
         return _chihos;
+    }
+
+    public Cities cities() {
+        if (_cities == null)
+            _cities = new Cities(this, Keys.DISTRICTS__FK_DISTRICTS_SHUTOS);
+
+        return _cities;
     }
 
     @Override
