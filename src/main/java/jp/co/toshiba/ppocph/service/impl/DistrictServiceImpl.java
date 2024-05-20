@@ -112,14 +112,15 @@ public final class DistrictServiceImpl implements IDistrictService {
 		final int offset = (pageNum - 1) * PgCrowdConstants.DEFAULT_PAGE_SIZE;
 		if (CommonProjectUtils.isEmpty(keyword)) {
 			final Integer totalRecords = this.dslContext.selectCount().from(DISTRICTS).innerJoin(CHIHOS)
-					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES).on(CITIES.ID.eq(DISTRICTS.SHUTO_ID))
+					.onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
+					.onKey(Keys.DISTRICTS__FK_DISTRICTS_SHUTOS)
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).fetchSingle()
 					.into(Integer.class);
 			final List<DistrictDto> districtDtos = this.dslContext
 					.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
 							CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
 					.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
-					.on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
+					.onKey(Keys.DISTRICTS__FK_DISTRICTS_SHUTOS).innerJoin(subQueryTable)
 					.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 					.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL)).orderBy(DISTRICTS.ID.asc())
 					.limit(PgCrowdConstants.DEFAULT_PAGE_SIZE).offset(offset).fetchInto(DistrictDto.class);
@@ -135,7 +136,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 				.select(DISTRICTS.ID, DISTRICTS.NAME, DISTRICTS.SHUTO_ID, CITIES.NAME.as("shutoName"),
 						CHIHOS.NAME.as("chiho"), subQueryTable.field("population"), DISTRICTS.DISTRICT_FLAG)
 				.from(DISTRICTS).innerJoin(CHIHOS).onKey(Keys.DISTRICTS__FK_DISTRICTS_CHIHOS).innerJoin(CITIES)
-				.on(CITIES.ID.eq(DISTRICTS.SHUTO_ID)).innerJoin(subQueryTable)
+				.onKey(Keys.DISTRICTS__FK_DISTRICTS_SHUTOS).innerJoin(subQueryTable)
 				.on(DISTRICTS.ID.eq(subQueryTable.field("districtId", Long.class)))
 				.where(DISTRICTS.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(DISTRICTS.NAME.like(searchStr).or(CHIHOS.NAME.like(searchStr)).or(CITIES.NAME.like(searchStr)))
