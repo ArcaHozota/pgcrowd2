@@ -34,7 +34,7 @@ function buildTableBody(result) {
 		let idTd = $("<th scope='row' class='text-center' style='width:150px;vertical-align:middle;'></th>").append(item.id);
 		let nameTd = $("<td class='text-center' style='width:70px;vertical-align:middle;'></td>").append(item.name);
 		let shutoTd = $("<td class='text-center' style='width:70px;vertical-align:middle;'></td>").append(item.shutoName);
-		let chihoTd = $("<td class='text-center' style='width:70px;vertical-align:middle;'></td>").append(item.chiho);
+		let chihoTd = $("<td class='text-center' style='width:70px;vertical-align:middle;'></td>").append(item.chihoName);
 		let populationTd = $("<td class='text-center' style='width:50px;vertical-align:middle;'></td>").append(patternedPop);
 		let flagImg = $("<img>").attr('src', '/pgcrowd/svgImages/getFlags?flags=' + item.districtFlag + '.svg').attr('alt', '').height(27).width(40);
 		let flagTd = $("<td class='text-center district-flg-td' role='button' style='width:50px;vertical-align:middle;'></td>").append(flagImg);
