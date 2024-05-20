@@ -47,7 +47,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 	private final DSLContext dslContext;
 
 	@Override
-	public List<ChihoDto> getDistrictChihos(final String chiho) {
+	public List<ChihoDto> getDistrictChihos(final String chihoName) {
 		final List<ChihoDto> chihoList = new ArrayList<>();
 		final List<ChihosRecord> chihosRecords = this.dslContext.selectDistinct(CHIHOS.fields()).from(CHIHOS)
 				.orderBy(CHIHOS.ID.asc()).fetchInto(ChihosRecord.class);
@@ -57,7 +57,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 			chihoDto.setName(item.getName());
 			return chihoDto;
 		}).collect(Collectors.toList());
-		chihoList.addAll(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getName(), chiho))
+		chihoList.addAll(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getName(), chihoName))
 				.collect(Collectors.toList()));
 		chihoList.addAll(chihos);
 		return chihoList.stream().distinct().collect(Collectors.toList());

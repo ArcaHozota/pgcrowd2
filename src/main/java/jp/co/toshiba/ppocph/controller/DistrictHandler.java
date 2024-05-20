@@ -90,6 +90,11 @@ public class DistrictHandler extends ActionSupport {
 	private String chihoId;
 
 	/**
+	 * 地方名称
+	 */
+	private String chihoName;
+
+	/**
 	 * 人口数量
 	 */
 	private Long population;
@@ -133,6 +138,7 @@ public class DistrictHandler extends ActionSupport {
 		this.districtDto.setId(this.getId());
 		this.districtDto.setName(this.getName());
 		this.districtDto.setChihoId(this.getChihoId());
+		this.districtDto.setChihoName(this.getChihoName());
 		this.districtDto.setShutoId(this.getShutoId());
 		this.districtDto.setShutoName(this.getShutoName());
 		this.districtDto.setPopulation(this.getPopulation());
