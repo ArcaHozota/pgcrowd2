@@ -29,8 +29,8 @@
 		font-size: 1.2em;
 	}
 </style>
-<script type="text/javascript" src="/static/jquery/jquery-3.7.1.min.js" nonce="Ytvk0lE3pg1BL713YR9i89Kn"></script>
-<script type="text/javascript" src="/static/layer/layer.js" nonce="Ytvk0lE3pg1BL713YR9i89Kn"></script>
+<script type="text/javascript" src="/static/jquery/jquery-3.7.1.min.js" nonce="${cspNonce}"></script>
+<script type="text/javascript" src="/static/layer/layer.js" nonce="${cspNonce}"></script>
 </head>
 <body>
     <div class="container">
@@ -71,9 +71,9 @@
 	            <button type="button" id="torokuBtn">登録</button>
             </div>
         </div>
-        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js" nonce="Ytvk0lE3pg1BL713YR9i89Kn"></script>
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js" nonce="${cspNonce}"></script>
 		<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     </div>
-    <script type="text/javascript" src="/static/customizes/logintoroku.js" nonce="Ytvk0lE3pg1BL713YR9i89Kn"></script>
+    <script type="text/javascript" src="/static/customizes/logintoroku.js" nonce="${cspNonce}"></script>
 </body>
 </html>
