@@ -8,7 +8,7 @@ import jp.co.toshiba.ppocph.common.PgCrowdConstants;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * Ogumaアプリケーション
+ * PgCrowdアプリケーション
  *
  * @author ArkamaHozota
  * @since 1.00beta
