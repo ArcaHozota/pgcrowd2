@@ -249,11 +249,12 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
 		if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto) && passwordMatch) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
-		} else if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
-			employeesRecord.setPassword(ENCODER.encode(password));
 		}
 		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
 		employeesRecord.setUsername(employeeDto.getUsername());
+		if (!passwordMatch) {
+			employeesRecord.setPassword(ENCODER.encode(password));
+		}
 		employeesRecord.setEmail(employeeDto.getEmail());
 		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), FORMATTER));
 		employeeRoleRecord.setRoleId(Long.parseLong(employeeDto.getRoleId()));
