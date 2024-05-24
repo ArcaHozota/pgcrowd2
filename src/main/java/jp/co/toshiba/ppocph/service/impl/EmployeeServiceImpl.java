@@ -43,6 +43,16 @@ import lombok.RequiredArgsConstructor;
 public final class EmployeeServiceImpl implements IEmployeeService {
 
 	/**
+	 * 日時フォマーター
+	 */
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	/**
+	 * エンコーダ
+	 */
+	private static final PasswordEncoder ENCODER = new BCryptPasswordEncoder(BCryptVersion.$2Y, 7);
+
+	/**
 	 * Randomナンバー
 	 */
 	private static final Random RANDOM = new Random();
@@ -51,16 +61,6 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 	 * 共通リポジトリ
 	 */
 	private final DSLContext dslContext;
-
-	/**
-	 * エンコーダ
-	 */
-	private final PasswordEncoder encoder = new BCryptPasswordEncoder(BCryptVersion.$2Y, 7);
-
-	/**
-	 * 日時フォマーター
-	 */
-	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	@Override
 	public ResultDto<String> checkDuplicated(final String loginAccount) {
@@ -83,7 +83,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		employeeDto.setUsername(employeesRecord.getUsername());
 		employeeDto.setPassword(PgCrowdConstants.DEFAULT_ROLE_NAME);
 		employeeDto.setEmail(employeesRecord.getEmail());
-		employeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
+		employeeDto.setDateOfBirth(FORMATTER.format(employeesRecord.getDateOfBirth()));
 		employeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
 		return employeeDto;
 	}
@@ -102,7 +102,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 			employeeDto.setUsername(employeesRecord.getUsername());
 			employeeDto.setPassword(employeesRecord.getPassword());
 			employeeDto.setEmail(employeesRecord.getEmail());
-			employeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
+			employeeDto.setDateOfBirth(FORMATTER.format(employeesRecord.getDateOfBirth()));
 			employeeDtos.add(employeeDto);
 			return Pagination.of(employeeDtos, employeeDtos.size(), pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
 		}
@@ -121,7 +121,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 				employeeDto.setUsername(item.getUsername());
 				employeeDto.setPassword(item.getPassword());
 				employeeDto.setEmail(item.getEmail());
-				employeeDto.setDateOfBirth(this.formatter.format(item.getDateOfBirth()));
+				employeeDto.setDateOfBirth(FORMATTER.format(item.getDateOfBirth()));
 				return employeeDto;
 			}).collect(Collectors.toList());
 			return Pagination.of(employeeDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
@@ -145,7 +145,7 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 			employeeDto.setUsername(item.getUsername());
 			employeeDto.setPassword(item.getPassword());
 			employeeDto.setEmail(item.getEmail());
-			employeeDto.setDateOfBirth(this.formatter.format(item.getDateOfBirth()));
+			employeeDto.setDateOfBirth(FORMATTER.format(item.getDateOfBirth()));
 			return employeeDto;
 		}).collect(Collectors.toList());
 		return Pagination.of(employeeDtos, totalRecords, pageNum, PgCrowdConstants.DEFAULT_PAGE_SIZE);
@@ -180,9 +180,9 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		employeesRecord.setId(SnowflakeUtils.snowflakeId());
 		employeesRecord.setLoginAccount(this.getRandomStr());
 		employeesRecord.setUsername(employeeDto.getUsername());
-		employeesRecord.setPassword(this.encoder.encode(employeeDto.getPassword()));
+		employeesRecord.setPassword(ENCODER.encode(employeeDto.getPassword()));
 		employeesRecord.setEmail(employeeDto.getEmail());
-		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
+		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), FORMATTER));
 		employeesRecord.setCreatedTime(LocalDateTime.now());
 		employeesRecord.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
 		final RolesRecord rolesRecord = this.dslContext.selectFrom(ROLES)
@@ -209,9 +209,9 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		employeesRecord.setId(SnowflakeUtils.snowflakeId());
 		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
 		employeesRecord.setUsername(employeeDto.getUsername());
-		employeesRecord.setPassword(this.encoder.encode(employeeDto.getPassword()));
+		employeesRecord.setPassword(ENCODER.encode(employeeDto.getPassword()));
 		employeesRecord.setEmail(employeeDto.getEmail());
-		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
+		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), FORMATTER));
 		employeesRecord.setCreatedTime(LocalDateTime.now());
 		employeesRecord.setDeleteFlg(PgCrowdConstants.LOGIC_DELETE_INITIAL);
 		if (CommonProjectUtils.isNotEmpty(employeeDto.getRoleId())
@@ -226,34 +226,36 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 
 	@Override
 	public ResultDto<String> update(final EmployeeDto employeeDto) {
-		final String nyuryokuPassword = employeeDto.getPassword();
-		employeeDto.setPassword(null);
+		final String password = employeeDto.getPassword();
 		final EmployeesRecord employeesRecord = this.dslContext.selectFrom(EMPLOYEES)
 				.where(EMPLOYEES.DELETE_FLG.eq(PgCrowdConstants.LOGIC_DELETE_INITIAL))
 				.and(EMPLOYEES.ID.eq(Long.parseLong(employeeDto.getId()))).fetchSingle();
 		final EmployeeRoleRecord employeeRoleRecord = this.dslContext.selectFrom(EMPLOYEE_ROLE)
 				.where(EMPLOYEE_ROLE.EMPLOYEE_ID.eq(Long.parseLong(employeeDto.getId()))).fetchSingle();
+		boolean passwordMatch = false;
+		if (CommonProjectUtils.isNotEmpty(password)) {
+			passwordMatch = ENCODER.matches(password, employeesRecord.getPassword());
+		} else {
+			passwordMatch = true;
+		}
+		employeeDto.setPassword(CommonProjectUtils.EMPTY_STRING);
 		final EmployeeDto aEmployeeDto = new EmployeeDto();
 		aEmployeeDto.setId(employeesRecord.getId().toString());
 		aEmployeeDto.setLoginAccount(employeesRecord.getLoginAccount());
 		aEmployeeDto.setUsername(employeesRecord.getUsername());
+		aEmployeeDto.setPassword(CommonProjectUtils.EMPTY_STRING);
 		aEmployeeDto.setEmail(employeesRecord.getEmail());
-		aEmployeeDto.setDateOfBirth(this.formatter.format(employeesRecord.getDateOfBirth()));
+		aEmployeeDto.setDateOfBirth(FORMATTER.format(employeesRecord.getDateOfBirth()));
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
-		if (CommonProjectUtils.isEmpty(nyuryokuPassword)) {
-			if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
-				return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
-			}
-		} else if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)
-				&& this.encoder.matches(nyuryokuPassword, employeesRecord.getPassword())) {
+		if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto) && passwordMatch) {
 			return ResultDto.failed(PgCrowdConstants.MESSAGE_STRING_NOCHANGE);
 		} else if (CommonProjectUtils.isEqual(aEmployeeDto, employeeDto)) {
-			employeesRecord.setPassword(this.encoder.encode(nyuryokuPassword));
+			employeesRecord.setPassword(ENCODER.encode(password));
 		}
 		employeesRecord.setLoginAccount(employeeDto.getLoginAccount());
 		employeesRecord.setUsername(employeeDto.getUsername());
 		employeesRecord.setEmail(employeeDto.getEmail());
-		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), this.formatter));
+		employeesRecord.setDateOfBirth(LocalDate.parse(employeeDto.getDateOfBirth(), FORMATTER));
 		employeeRoleRecord.setRoleId(Long.parseLong(employeeDto.getRoleId()));
 		try {
 			this.dslContext.update(EMPLOYEE_ROLE).set(employeeRoleRecord)
