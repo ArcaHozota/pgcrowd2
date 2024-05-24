@@ -56,6 +56,21 @@ $("#saveInfoBtn").on('click', function() {
 		pgcrowdAjaxModify('/pgcrowd/employee/infoSave', 'POST', postData, employeePostSuccessFunction);
 	}
 });
+$("#loginAccountEdit").on("change", function() {
+	$.ajax({
+		url: '/pgcrowd/employee/check',
+		data: 'loginAcct=' + this.value,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if (result.status === 'SUCCESS') {
+				showValidationMsg(this, "success", "√");
+			} else {
+				showValidationMsg(this, "error", result.message);
+			}
+		}
+	});
+});
 $("#passwordEdit").on("change", function() {
 	let editPassword = this.value;
 	let regularPassword = /^[a-zA-Z\d]{8,23}$/;

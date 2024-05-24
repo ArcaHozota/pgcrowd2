@@ -122,6 +122,19 @@ public class EmployeeHandler extends ActionSupport {
 	}
 
 	/**
+	 * 名称重複チェック
+	 *
+	 * @return String
+	 */
+	@Action(PgCrowdURLConstants.URL_CHECK_NAME)
+	public String checkDuplicated() {
+		final String loginAcct = ActionContext.getContext().getServletRequest().getParameter("loginAcct");
+		final ResultDto<String> checkDuplicated = this.iEmployeeService.checkDuplicated(loginAcct);
+		this.setResponsedJsondata(checkDuplicated);
+		return NONE;
+	}
+
+	/**
 	 * getter for employeeDto
 	 *
 	 * @return EmployeeDto

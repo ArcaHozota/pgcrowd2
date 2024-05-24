@@ -29,7 +29,8 @@
 							<div class="form-group row">
 						        <label for="loginAccountEdit" class="col-sm-3 col-form-label text-right">ログインアカウント</label>
 						        <div class="col-sm-7" style="height: 5.7vh;">
-						            <p class="form-control" id="loginAccountEdit">${arawaseta.loginAccount}</p>
+						            <input type="text" class="form-control" value="${arawaseta.loginAccount}" 
+						            	id="loginAccountEdit" placeholder="アカウントを入力してください">
 						            <span class="text-muted" style="font-size: 10px;"></span>
 						        </div>
 						    </div>
