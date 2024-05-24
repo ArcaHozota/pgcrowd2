@@ -9,7 +9,6 @@ $("#loginAccountInput").on("change", function() {
 		url: '/pgcrowd/employee/check',
 		data: 'loginAcct=' + this.value,
 		type: 'GET',
-		dataType: 'json',
 		success: function(result) {
 			if (result.status === 'SUCCESS') {
 				showValidationMsg(this, "success", "√");
@@ -61,7 +60,6 @@ $("#loginAccountEdit").on("change", function() {
 		url: '/pgcrowd/employee/check',
 		data: 'loginAcct=' + this.value,
 		type: 'GET',
-		dataType: 'json',
 		success: function(result) {
 			if (result.status === 'SUCCESS') {
 				showValidationMsg(this, "success", "√");
