@@ -238,12 +238,11 @@ public final class EmployeeServiceImpl implements IEmployeeService {
 		} else {
 			passwordMatch = true;
 		}
-		employeeDto.setPassword(CommonProjectUtils.EMPTY_STRING);
 		final EmployeeDto aEmployeeDto = new EmployeeDto();
 		aEmployeeDto.setId(employeesRecord.getId().toString());
 		aEmployeeDto.setLoginAccount(employeesRecord.getLoginAccount());
 		aEmployeeDto.setUsername(employeesRecord.getUsername());
-		aEmployeeDto.setPassword(CommonProjectUtils.EMPTY_STRING);
+		aEmployeeDto.setPassword(password);
 		aEmployeeDto.setEmail(employeesRecord.getEmail());
 		aEmployeeDto.setDateOfBirth(FORMATTER.format(employeesRecord.getDateOfBirth()));
 		aEmployeeDto.setRoleId(employeeRoleRecord.getRoleId().toString());
