@@ -138,25 +138,6 @@ $(document).ready(function() {
 		checkPermissionAndTransfer(url);
 	});
 });
-document.addEventListener("mousemove", function(e) {
-	// Create a new <span> element
-	let star = $('<span>');
-	// Generate random values for size and rotation
-	let size = Math.random() * 40;
-	let transformVal = Math.random() * 360;
-	// Set CSS properties for the star
-	$(star).css({
-		'left': e.offsetX + 'px',
-		'top': e.offsetY + 'px',
-		'font-size': '10px' + size + 'px',
-		'transform': 'rotate(' + transformVal + 'deg)'
-	});
-	// Append the star to the document
-	$('body').append(star);
-	setTimeout(function() {
-		star.remove();
-	}, 1000);
-});
 function checkPermissionAndTransfer(stringUrl) {
 	let ajaxResult = $.ajax({
 		url: stringUrl,
