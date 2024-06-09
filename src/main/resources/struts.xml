@@ -27,7 +27,7 @@
 		value="false" />
 	<!-- 指定视图文件所在的目录地址 -->
 	<constant name="struts.convention.result.path"
-		value="/WEB-INF/" />
+		value="/templates/" />
 	<!--设置Convention插件是否从其它jar包中搜索Action类，默认值为true -->
 	<constant name="struts.convention.action.disableJarScanning"
 		value="true" />
