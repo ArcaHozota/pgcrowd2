@@ -132,10 +132,10 @@ public final class RoleServiceImpl implements IRoleService {
 		} else {
 			final EmployeeRoleRecord employeeRoleRecord = this.dslContext.selectFrom(EMPLOYEE_ROLE)
 					.where(EMPLOYEE_ROLE.EMPLOYEE_ID.eq(Long.parseLong(employeeId))).fetchSingle();
-			final List<RoleDto> list = roleDtos1.stream()
+			final RoleDto roleDto = roleDtos1.stream()
 					.filter(a -> CommonProjectUtils.isEqual(employeeRoleRecord.getRoleId(), Long.parseLong(a.getId())))
-					.collect(Collectors.toList());
-			roleDtos.addAll(list);
+					.findFirst().get();
+			roleDtos.add(roleDto);
 		}
 		roleDtos.addAll(roleDtos1);
 		return roleDtos.stream().distinct().collect(Collectors.toList());

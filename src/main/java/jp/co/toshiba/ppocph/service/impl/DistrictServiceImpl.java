@@ -57,8 +57,8 @@ public final class DistrictServiceImpl implements IDistrictService {
 			chihoDto.setName(item.getName());
 			return chihoDto;
 		}).collect(Collectors.toList());
-		chihoList.addAll(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getName(), chihoName))
-				.collect(Collectors.toList()));
+		chihoList
+				.add(chihos.stream().filter(a -> CommonProjectUtils.isEqual(a.getName(), chihoName)).findFirst().get());
 		chihoList.addAll(chihos);
 		return chihoList.stream().distinct().collect(Collectors.toList());
 	}
@@ -77,8 +77,7 @@ public final class DistrictServiceImpl implements IDistrictService {
 			return aCityDto;
 		}).collect(Collectors.toList());
 		final CityDto cityDto = cityDtos.stream()
-				.filter(a -> CommonProjectUtils.isEqual(a.getName(), districtDto.getShutoName()))
-				.collect(Collectors.toList()).get(0);
+				.filter(a -> CommonProjectUtils.isEqual(a.getName(), districtDto.getShutoName())).findFirst().get();
 		shutos.add(cityDto);
 		shutos.addAll(cityDtos);
 		return shutos.stream().distinct().collect(Collectors.toList());
