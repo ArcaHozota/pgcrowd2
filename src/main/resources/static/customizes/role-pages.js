@@ -206,6 +206,7 @@ function authPutSuccessFunction(result) {
 function zTreeOnNodeCreated(event, treeId, treeNode) { // 设置节点创建时的回调函数
 	let iconObj = $("#" + treeNode.tId + "_ico"); // 获取图标元素
 	iconObj.removeClass("button ico_docu ico_open ico_close");
+	iconObj.append("<i class='fa'></i>");
 	let iconObjectId = Number(iconObj.attr("id").substring(9, 10));
 	if ($.isNumeric(iconObj.attr("id").substring(10, 11))) {
 		iconObjectId = Number(iconObj.attr("id").substring(9, 11));
@@ -214,12 +215,12 @@ function zTreeOnNodeCreated(event, treeId, treeNode) { // 设置节点创建时�
 	let deleteIdArrays = [2, 6, 13];
 	let retrieveIdArrays = [3, 7, 10, 14];
 	if (pIdArrays.includes(iconObjectId)) {
-		iconObj.find("i").addClass("fa fa-safari");
+		iconObj.find("i").addClass("fa-safari");
 	} else if (deleteIdArrays.includes(iconObjectId)) {
-		iconObj.find("i").addClass("fa fa-android");
+		iconObj.find("i").addClass("fa-android");
 	} else if (retrieveIdArrays.includes(iconObjectId)) {
-		iconObj.find("i").addClass("fa fa-amazon");
+		iconObj.find("i").addClass("fa-amazon");
 	} else {
-		iconObj.find("i").addClass("fa fa-apple");
+		iconObj.find("i").addClass("fa-apple");
 	}
 }
